@@ -9,50 +9,12 @@
 <body>
     <div class="container">
         <!-- SIDEBAR -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1>👔 ShopAdmin</h1>
-                <p>Quản lý cửa hàng quần áo</p>
-            </div>
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="http://localhost:8080/cms/dashboard" class="active">
-                        <span>📊</span> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="http://localhost:8080/cms/product-manager">
-                        <span>👕</span> Quản lý quần áo
-                    </a>
-                </li>
-                <li>
-                    <a href="http://localhost:8080/cms/product-orders">
-                        <span>📦</span> Đơn hàng
-                    </a>
-                </li>
-                <li>
-                    <a href="http://localhost:8080/cms/product-inventory">
-                        <span>📈</span> Tồn kho
-                    </a>
-                </li>
-                <li>
-                    <a href="http://localhost:8080/home" onclick="logout()">
-                        <span>🚪</span> Đăng xuất
-                    </a>
-                </li>
-            </ul>
-        </aside>
+        <div th:include="cms/common/sidebar.html :: sidebar-fragment"></div>
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <!-- HEADER -->
-            <div class="header">
-                <h2>Dashboard</h2>
-                <div class="user-info">
-                    <div>Admin Shop</div>
-                    <div class="user-avatar">A</div>
-                </div>
-            </div>
+            <div th:replace="cms/common/header.html :: header('Dashboard')"></div>
 
             <!-- STATISTICS -->
             <div class="stats-grid">

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="header" th:fragment="header(title)">
+    <h2 th:text="${title}">Dashboard</h2>
+    <div class="user-info">
+        <div>Admin Shop</div>
+        <div class="user-avatar">A</div>
+    </div>
+</div>
+</body>
+</html>

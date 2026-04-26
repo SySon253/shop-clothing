@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="sidebar-fragment">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>👔 ShopAdmin</h1>
+            <p>Quản lý cửa hàng quần áo</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="http://localhost:8080/cms/dashboard">
+                    <span>📊</span> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:8080/cms/product-manager">
+                    <span>👕</span> Quản lý quần áo
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:8080/cms/product-orders">
+                    <span>📦</span> Đơn hàng
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:8080/cms/product-inventory">
+                    <span>📈</span> Tồn kho
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:8080/home">
+                    <span>🚪</span> Đăng xuất
+                </a>
+            </li>
+        </ul>
+
+    </aside>
+</div>
+
+</body>
+</html>
