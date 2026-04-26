@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Shop Quần Áo</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>👔 ShopAdmin</h1>
+                <p>Quản lý cửa hàng quần áo</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="http://localhost:8080/cms/dashboard" class="active">
+                        <span>📊</span> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="http://localhost:8080/cms/product-manager">
+                        <span>👕</span> Quản lý quần áo
+                    </a>
+                </li>
+                <li>
+                    <a href="http://localhost:8080/cms/product-orders">
+                        <span>📦</span> Đơn hàng
+                    </a>
+                </li>
+                <li>
+                    <a href="http://localhost:8080/cms/product-inventory">
+                        <span>📈</span> Tồn kho
+                    </a>
+                </li>
+                <li>
+                    <a href="http://localhost:8080/home" onclick="logout()">
+                        <span>🚪</span> Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <div class="header">
+                <h2>Dashboard</h2>
+                <div class="user-info">
+                    <div>Admin Shop</div>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+
+            <!-- STATISTICS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👕</div>
+                    <div class="stat-label">Tổng sản phẩm</div>
+                    <div class="stat-value">245</div>
+                    <div class="stat-change">↑ 12 sản phẩm mới</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-label">Đơn hàng hôm nay</div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-change">↑ 5 đơn hàng mới</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-label">Doanh thu hôm nay</div>
+                    <div class="stat-value">12.5M</div>
+                    <div class="stat-change">↑ 8% so với hôm qua</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-label">Sản phẩm sắp hết</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-change">Cần nhập hàng gấp</div>
+                </div>
+            </div>
+
+            <!-- CHARTS SECTION -->
+            <div class="chart-container">
+                <h3>📊 Doanh thu 7 ngày gần đây</h3>
+                <div class="chart-placeholder">
+                    Biểu đồ doanh thu (Dữ liệu mẫu)
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3>📈 Danh mục sản phẩm bán chạy</h3>
+                <div class="chart-placeholder">
+                    Biểu đồ danh mục (Dữ liệu mẫu)
+                </div>
+            </div>
+
+            <!-- RECENT ORDERS -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Đơn hàng gần đây</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#ORD001</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>Áo thun tím</td>
+                            <td>150,000đ</td>
+                            <td><span class="badge badge-success">Đã giao</span></td>
+                            <td>26/04/2026</td>
+                        </tr>
+                        <tr>
+                            <td>#ORD002</td>
+                            <td>Trần Thị B</td>
+                            <td>Quần jean</td>
+                            <td>450,000đ</td>
+                            <td><span class="badge badge-info">Đang giao</span></td>
+                            <td>26/04/2026</td>
+                        </tr>
+                        <tr>
+                            <td>#ORD003</td>
+                            <td>Lê Văn C</td>
+                            <td>Áo sơ mi trắng</td>
+                            <td>200,000đ</td>
+                            <td><span class="badge badge-warning">Đang xử lý</span></td>
+                            <td>26/04/2026</td>
+                        </tr>
+                        <tr>
+                            <td>#ORD004</td>
+                            <td>Phạm Thị D</td>
+                            <td>Váy chữ A</td>
+                            <td>320,000đ</td>
+                            <td><span class="badge badge-success">Đã giao</span></td>
+                            <td>25/04/2026</td>
+                        </tr>
+                        <tr>
+                            <td>#ORD005</td>
+                            <td>Hoàng Văn E</td>
+                            <td>Áo khoác gió</td>
+                            <td>380,000đ</td>
+                            <td><span class="badge badge-danger">Hủy</span></td>
+                            <td>25/04/2026</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- LOW STOCK PRODUCTS -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Sản phẩm tồn kho thấp</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tên sản phẩm</th>
+                            <th>SKU</th>
+                            <th>Tồn kho</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Áo thun đen</td>
+                            <td>SKU001</td>
+                            <td>5</td>
+                            <td><span class="stock-status low"><span class="stock-dot low"></span>Sắp hết</span></td>
+                            <td><button class="btn btn-primary btn-sm">Nhập hàng</button></td>
+                        </tr>
+                        <tr>
+                            <td>Quần short nữ</td>
+                            <td>SKU015</td>
+                            <td>8</td>
+                            <td><span class="stock-status low"><span class="stock-dot low"></span>Sắp hết</span></td>
+                            <td><button class="btn btn-primary btn-sm">Nhập hàng</button></td>
+                        </tr>
+                        <tr>
+                            <td>Áo sơ mi xanh</td>
+                            <td>SKU028</td>
+                            <td>12</td>
+                            <td><span class="stock-status medium"><span class="stock-dot medium"></span>Vừa phải</span></td>
+                            <td><button class="btn btn-primary btn-sm">Nhập hàng</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('Bạn chắc chắn muốn đăng xuất?')) {
+                alert('Đã đăng xuất thành công!');
+                // Redirect to login page
+            }
+        }
+    </script>
+</body>
+</html>
