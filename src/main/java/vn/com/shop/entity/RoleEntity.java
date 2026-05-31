@@ -12,7 +12,7 @@ public class RoleEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Role_ID")
-    private int roleId;
+    private Long roleId;
 
     private String roleName;
     private boolean deleted;

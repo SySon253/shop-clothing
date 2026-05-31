@@ -12,7 +12,7 @@ public class CategoryEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CategoryID")
-    private int categoryID;
+    private Long categoryID;
 
     private String categoryName;
 }
