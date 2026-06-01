@@ -9,11 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RoleEntity extends BaseEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Role_ID")
-    private Long roleId;
-
-    private String roleName;
-    private boolean deleted;
+    @Column(unique = true)
+    private String name;
+    private String description;
 }

@@ -8,18 +8,12 @@ import lombok.Setter;
 @Table(name = "cart_item")
 @Getter
 @Setter
-public class CartItemEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private Integer quantity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id")
+public class CartItemEntity extends BaseEntity{
+    @ManyToOne
     private CartEntity cart;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id")
-    private ProductVariantEntity productVariant;
+    @ManyToOne
+    private ProductVariantEntity variant;
+
+    private Integer quantity;
 }

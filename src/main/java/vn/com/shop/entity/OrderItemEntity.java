@@ -8,19 +8,14 @@ import lombok.Setter;
 @Table(name = "order_item")
 @Getter
 @Setter
-public class OrderItemEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private Integer quantity;
-    private Double price;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
+public class OrderItemEntity extends BaseEntity {
+    @ManyToOne
     private OrderEntity order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id")
-    private ProductVariantEntity productVariant;
+    private String productName;
+    private String sku;
+    private String size;
+    private String color;
+    private Double price;
+    private Integer quantity;
 }

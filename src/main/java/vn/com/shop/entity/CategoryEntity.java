@@ -4,15 +4,19 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "category")
 @Getter
 @Setter
 public class CategoryEntity extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CategoryID")
-    private Long categoryID;
+    private String name;
+    private String slug;
 
-    private String categoryName;
+    @ManyToOne
+    private CategoryEntity parent;
+
+    @OneToMany(mappedBy = "parent")
+    private Set<CategoryEntity> children;
 }

@@ -4,30 +4,29 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "product")
 @Getter
 @Setter
 public class ProductEntity extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ProductID")
-    private Long productID;
+    private String name;
 
-    private String productName;
+    @Column(unique = true)
+    private String slug;
+
+    @Lob
     private String description;
     private String brand;
-    private String status;
+    private Boolean active = true;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @ManyToOne
     private CategoryEntity category;
 
-    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
-    private List<ProductVariantEntity> variants;
+    @OneToMany(mappedBy = "product")
+    private Set<ProductImageEntity> images;
 
-    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
-    private List<ProductImageEntity> images;
+    @OneToMany(mappedBy = "product")
+    private Set<ProductVariantEntity> variants;
 }

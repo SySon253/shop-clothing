@@ -13,19 +13,14 @@ import java.util.Set;
 @Getter
 @Setter
 public class UserEntity extends BaseEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "User_Id")
-    private Long userId;
-
-    private String firstName;
-    private String lastName;
+    @Column(unique = true)
+    private String username;
+    @Column(unique = true)
     private String email;
     private String password;
+    private String fullName;
     private String phone;
-    private String address;
-    private boolean deleted;
-    private String code;
+    private Boolean enabled = true;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
