@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import vn.com.shop.dto.product.ProductResponseDTO;
+import vn.com.shop.entity.CategoryEntity;
 import vn.com.shop.entity.ProductEntity;
 
 @Component
@@ -45,6 +46,12 @@ public class ProductMapper {
         productEntity.setId(productResponseDTO.getId());
         productEntity.setName(productResponseDTO.getName());
         productEntity.setDescription(productResponseDTO.getDescription());
+        productEntity.setSlug(productResponseDTO.getSlug());
+        productEntity.setBrand(productResponseDTO.getBrand());
+        productEntity.setActive(true);
+
         return productEntity;
     }
+
+
 }

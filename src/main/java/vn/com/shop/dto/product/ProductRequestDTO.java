@@ -1,16 +1,13 @@
 package vn.com.shop.dto.product;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class ProductCreateDTO {
+@Data
+public class ProductRequestDTO {
     private String name;
     private String slug;
     private String description;
     private String brand;
+    private Boolean active;
     private Long categoryId;
-    private String createBy;
-    private String lastModifiedBy;
 }
