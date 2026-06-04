@@ -29,4 +29,16 @@ public class ProductImageController {
     public ResponseEntity<List<ProductImageResponseDTO>> getProductImages(@PathVariable Long productId) {
         return ResponseEntity.ok(productImageService.getImagesByProductId(productId));
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductImageResponseDTO> updateImage(@PathVariable Long id, @RequestBody ProductImageRequestDTO requestDTO) {
+        ProductImageResponseDTO productImageResponseDTO = productImageService.updateImage(id, requestDTO);
+        return ResponseEntity.ok(productImageResponseDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProductImageResponseDTO> deleteImage(@PathVariable Long id) {
+        productImageService.deleteImage(id);
+        return ResponseEntity.noContent().build();
+    }
 }

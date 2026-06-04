@@ -27,4 +27,16 @@ public class ProductVariantController {
     public ResponseEntity<List<ProductVariantResponseDTO>> getProductVariant(@PathVariable Long productId){
         return ResponseEntity.ok(productVariantService.getVariantsByProduct(productId));
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductVariantResponseDTO> updateVariant(@PathVariable Long id, @RequestBody ProductVariantRequestDTO requestDTO){
+        ProductVariantResponseDTO productVariantResponseDTO = productVariantService.updateVariant(id, requestDTO);
+        return ResponseEntity.ok(productVariantResponseDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProductVariantResponseDTO> deleteVariant(@PathVariable Long id){
+        productVariantService.deleteVariant(id);
+        return ResponseEntity.ok(productVariantService.getVariantById(id));
+    }
 }
