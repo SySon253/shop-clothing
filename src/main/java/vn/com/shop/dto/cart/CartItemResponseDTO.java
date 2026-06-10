@@ -3,7 +3,6 @@ package vn.com.shop.dto.cart;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,7 +13,7 @@ public class CartItemResponseDTO {
     private String sku;
     private String size;
     private String color;
-    private BigDecimal price;
+    private Double price;
     private Integer quantity;
-    private BigDecimal subtotal;
+    private Double subtotal;
 }

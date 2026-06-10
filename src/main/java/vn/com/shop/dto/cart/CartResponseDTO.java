@@ -10,6 +10,8 @@ import java.util.List;
 @Setter
 public class CartResponseDTO {
     private Long id;
+    private Long userId;
+    private Integer totalItems;
+    private Double totalPrice;
     private List<CartItemResponseDTO> items;
-    private BigDecimal totalAmount;
 }
