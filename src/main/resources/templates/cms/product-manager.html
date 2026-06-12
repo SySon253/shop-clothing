@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý quần áo - Admin Shop</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="../cms/product-manager.js"></script>
 </head>
 <body>
     <div class="container">
@@ -40,81 +41,7 @@
                         </tr>
                     </thead>
                     <tbody id="productList">
-                        <tr>
-                            <td><div style="width: 50px; height: 50px; background-color: #bdc3c7; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white;">👕</div></td>
-                            <td>Áo thun tím</td>
-                            <td>SKU001</td>
-                            <td>Áo phông</td>
-                            <td>150,000đ</td>
-                            <td>45</td>
-                            <td><span class="badge badge-success">Còn hàng</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick="editProduct(1, 'Áo thun tím', 'SKU001', 'Áo phông', 150000, 45)">Sửa</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(1)">Xóa</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><div style="width: 50px; height: 50px; background-color: #bdc3c7; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white;">👖</div></td>
-                            <td>Quần jean xanh</td>
-                            <td>SKU002</td>
-                            <td>Quần</td>
-                            <td>450,000đ</td>
-                            <td>32</td>
-                            <td><span class="badge badge-success">Còn hàng</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick="editProduct(2, 'Quần jean xanh', 'SKU002', 'Quần', 450000, 32)">Sửa</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(2)">Xóa</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><div style="width: 50px; height: 50px; background-color: #bdc3c7; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white;">🩳</div></td>
-                            <td>Áo sơ mi trắng</td>
-                            <td>SKU003</td>
-                            <td>Áo sơ mi</td>
-                            <td>200,000đ</td>
-                            <td>28</td>
-                            <td><span class="badge badge-success">Còn hàng</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick="editProduct(3, 'Áo sơ mi trắng', 'SKU003', 'Áo sơ mi', 200000, 28)">Sửa</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(3)">Xóa</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><div style="width: 50px; height: 50px; background-color: #bdc3c7; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white;">👗</div></td>
-                            <td>Váy chữ A đỏ</td>
-                            <td>SKU004</td>
-                            <td>Váy</td>
-                            <td>320,000đ</td>
-                            <td>5</td>
-                            <td><span class="badge badge-danger">Sắp hết</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick="editProduct(4, 'Váy chữ A đỏ', 'SKU004', 'Váy', 320000, 5)">Sửa</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(4)">Xóa</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><div style="width: 50px; height: 50px; background-color: #bdc3c7; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white;">🧥</div></td>
-                            <td>Áo khoác gió</td>
-                            <td>SKU005</td>
-                            <td>Áo khoác</td>
-                            <td>380,000đ</td>
-                            <td>18</td>
-                            <td><span class="badge badge-success">Còn hàng</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick="editProduct(5, 'Áo khoác gió', 'SKU005', 'Áo khoác', 380000, 18)">Sửa</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(5)">Xóa</button>
-                                </div>
-                            </td>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -134,53 +61,87 @@
                     <input type="text" id="productName" required>
                 </div>
 
+                <div class="form-group">
+                    <label>Thương hiệu</label>
+                    <input type="text" id="productBrand" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Danh mục</label>
+                    <select id="productCategory" required>
+                        <option value="">Chọn danh mục</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Size</label>
+                        <input type="text" id="productSize">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Màu sắc</label>
+                        <input type="text" id="productColor">
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>SKU</label>
                         <input type="text" id="productSKU" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Danh mục</label>
-                        <select id="productCategory" required>
-                            <option value="">Chọn danh mục</option>
-                            <option value="Áo phông">Áo phông</option>
-                            <option value="Áo sơ mi">Áo sơ mi</option>
-                            <option value="Quần">Quần</option>
-                            <option value="Váy">Váy</option>
-                            <option value="Áo khoác">Áo khoác</option>
-                            <option value="Khác">Khác</option>
-                        </select>
+                        <label>Giá</label>
+                        <input type="number" id="productPrice" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Giá (đ)</label>
-                        <input type="number" id="productPrice" min="1000" required>
-                    </div>
-                    <div class="form-group">
                         <label>Tồn kho</label>
-                        <input type="number" id="productStock" min="0" required>
+                        <input type="number" id="productStock" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hình ảnh URL</label>
+                        <input type="text" id="productImage">
                     </div>
                 </div>
+
+<!--                <div class="form-row">-->
+<!--                    <div class="form-group">-->
+<!--                        <label>Giá giảm</label>-->
+<!--                        <input type="number" id="discountPrice">-->
+<!--                    </div>-->
+
+<!--                    <div class="form-group">-->
+<!--                        <label>Tồn giữ chỗ</label>-->
+<!--                        <input type="number" id="reservedStock" value="0">-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <div class="form-group">
                     <label>Mô tả</label>
-                    <textarea id="productDescription" placeholder="Nhập mô tả sản phẩm..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Hình ảnh URL</label>
-                    <input type="text" id="productImage" placeholder="https://...">
+                    <textarea id="productDescription"></textarea>
                 </div>
 
                 <div class="form-buttons">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()" style="background-color: #95a5a6;">Hủy</button>
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="closeModal()">
+                        Hủy
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Lưu
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+
 
     <script>
         let isEditMode = false;
@@ -194,38 +155,38 @@
             document.getElementById('productModal').classList.add('show');
         }
 
-        function editProduct(id, name, sku, category, price, stock) {
-            isEditMode = true;
-            editingId = id;
-            document.getElementById('modalTitle').textContent = 'Chỉnh sửa sản phẩm';
-            document.getElementById('productName').value = name;
-            document.getElementById('productSKU').value = sku;
-            document.getElementById('productCategory').value = category;
-            document.getElementById('productPrice').value = price;
-            document.getElementById('productStock').value = stock;
-            document.getElementById('productModal').classList.add('show');
-        }
+        // function editProduct(id, name, sku, category, price, stock) {
+        //     isEditMode = true;
+        //     editingId = id;
+        //     document.getElementById('modalTitle').textContent = 'Chỉnh sửa sản phẩm';
+        //     document.getElementById('productName').value = name;
+        //     document.getElementById('productSKU').value = sku;
+        //     document.getElementById('productCategory').value = category;
+        //     document.getElementById('productPrice').value = price;
+        //     document.getElementById('productStock').value = stock;
+        //     document.getElementById('productModal').classList.add('show');
+        // }
 
         function closeModal() {
             document.getElementById('productModal').classList.remove('show');
             document.getElementById('productForm').reset();
         }
 
-        function saveProduct(event) {
-            event.preventDefault();
-            const name = document.getElementById('productName').value;
-            const sku = document.getElementById('productSKU').value;
-            const category = document.getElementById('productCategory').value;
-            const price = document.getElementById('productPrice').value;
-            const stock = document.getElementById('productStock').value;
-
-            if (isEditMode) {
-                alert('Cập nhật sản phẩm ' + name + ' thành công!');
-            } else {
-                alert('Thêm sản phẩm ' + name + ' thành công!');
-            }
-            closeModal();
-        }
+        // function saveProduct(event) {
+        //     event.preventDefault();
+        //     const name = document.getElementById('productName').value;
+        //     const sku = document.getElementById('productSKU').value;
+        //     const category = document.getElementById('productCategory').value;
+        //     const price = document.getElementById('productPrice').value;
+        //     const stock = document.getElementById('productStock').value;
+        //
+        //     if (isEditMode) {
+        //         alert('Cập nhật sản phẩm ' + name + ' thành công!');
+        //     } else {
+        //         alert('Thêm sản phẩm ' + name + ' thành công!');
+        //     }
+        //     closeModal();
+        // }
 
         function deleteProduct(id) {
             if (confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) {
