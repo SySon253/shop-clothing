@@ -6,6 +6,8 @@ import vn.com.shop.entity.CartItemEntity;
 import vn.com.shop.entity.ProductEntity;
 import vn.com.shop.entity.ProductVariantEntity;
 
+import java.math.BigDecimal;
+
 @Component
 public class CartItemMapper {
     public CartItemResponseDTO cartItemToDto(CartItemEntity cartItemEntity){
@@ -20,11 +22,11 @@ public class CartItemMapper {
         cartItemResponseDTO.setSize(productVariantEntity.getSize());
         cartItemResponseDTO.setColor(productVariantEntity.getColor());
 
-        Double price = productVariantEntity.getPrice() != null ? productVariantEntity.getDiscountPrice() : productVariantEntity.getPrice();
+        BigDecimal price = productVariantEntity.getPrice() != null ? productVariantEntity.getDiscountPrice() : productVariantEntity.getPrice();
 
         cartItemResponseDTO.setPrice(price);
         cartItemResponseDTO.setQuantity(cartItemEntity.getQuantity());
-        cartItemResponseDTO.setSubtotal(cartItemEntity.getQuantity() * price);
+        cartItemResponseDTO.setSubtotal(cartItemEntity.getQuantity() * price.doubleValue());
 
         return cartItemResponseDTO;
     }

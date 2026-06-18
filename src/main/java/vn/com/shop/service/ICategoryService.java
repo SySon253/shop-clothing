@@ -11,7 +11,7 @@ import vn.com.shop.dto.response.ResponsePage;
 import java.util.List;
 
 public interface ICategoryService{
-    ResponsePage<List<CategoryResponseDTO>> getAllCategories(CategoryRequestFilter requestFilter, Pageable pageable);
+    ResponsePage<CategoryResponseDTO> getAllCategories(CategoryRequestFilter requestFilter, Pageable pageable);
     List<CategoryResponseDTO> getCategoryByName(String name);
     CategoryResponseDTO createCategory(CategoryCreateDTO categoryCreateDTO);
     CategoryResponseDTO updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO);

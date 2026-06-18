@@ -21,7 +21,7 @@ import java.util.List;
 public class ProductResourceController {
     private final IProductService productService;
     @PostMapping("/all-product")
-    public ResponseEntity<ResponsePage<List<ProductResponseDTO>>> getAllProduct(
+    public ResponseEntity<ResponsePage<ProductResponseDTO>> getAllProduct(
             @RequestBody ProductRequestFilter requestFilter,
             Pageable pageable) {
         return ResponseEntity.ok(productService.getAllProduct(requestFilter, pageable));
@@ -38,7 +38,16 @@ public class ProductResourceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDTO);
     }
 
-    @PatchMapping("/{id}")
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ProductResponseDTO> getProductById(
+            @PathVariable Long id){
+
+        return ResponseEntity.ok(
+                productService.getProductById(id)
+        );
+    }
+
+    @PatchMapping("/id/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO productUpdateDTO) {
         ProductResponseDTO productResponseDTO = productService.updateProduct(id, productUpdateDTO);
         return ResponseEntity.ok(productResponseDTO);

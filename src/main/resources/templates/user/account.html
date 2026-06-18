@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Thông tin tài khoản</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #0d0d0d;
+            font-family: Inter, sans-serif;
+            color: #f5f0e8;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+            padding: 80px 20px;
+        }
+
+        .title-small {
+            color: #c9a84c;
+            font-size: 12px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        h1,h2,h3 {
+            font-family: "Playfair Display", serif;
+        }
+
+        h1 {
+            font-size: 36px;
+        }
+
+        .card {
+            background: #161616;
+            border: 1px solid rgba(201,168,76,.15);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+
+        .profile {
+            display:flex;
+            align-items:center;
+            gap:20px;
+        }
+
+        .avatar {
+            width:80px;
+            height:80px;
+            border-radius:50%;
+            background:linear-gradient(135deg,#c9a84c,#8b6914);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:32px;
+        }
+
+
+        .camera {
+            width:28px;
+            height:28px;
+            background:#c9a84c;
+            color:#111;
+            border-radius:50%;
+            border:none;
+            position:absolute;
+            bottom:0;
+            right:0;
+        }
+
+        .avatar-box {
+            position:relative;
+        }
+
+
+        .member {
+            margin-top:10px;
+            display:inline-block;
+            padding:5px 12px;
+            border-radius:20px;
+            color:#c9a84c;
+            background:rgba(201,168,76,.15);
+            border:1px solid rgba(201,168,76,.3);
+            font-size:12px;
+        }
+
+
+        button {
+            cursor:pointer;
+            border:none;
+        }
+
+
+        .edit-btn {
+            margin-left:auto;
+            padding:10px 20px;
+            background:rgba(201,168,76,.1);
+            border:1px solid rgba(201,168,76,.3);
+            color:#c9a84c;
+            border-radius:8px;
+        }
+
+
+        .form-grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:20px;
+        }
+
+
+        .field.full {
+            grid-column:span 2;
+        }
+
+
+        label {
+            display:block;
+            color:#888;
+            font-size:12px;
+            margin-bottom:8px;
+            text-transform:uppercase;
+        }
+
+
+        input {
+            width:100%;
+            padding:13px;
+            padding-left:15px;
+            background:#111;
+            border:1px solid #333;
+            border-radius:8px;
+            color:white;
+        }
+
+
+        input:disabled {
+            opacity:.7;
+        }
+
+
+        .actions {
+            margin-top:25px;
+            display:flex;
+            gap:10px;
+        }
+
+
+        .save {
+            background:#c9a84c;
+            color:#111;
+            padding:12px 25px;
+            border-radius:8px;
+        }
+
+
+        .cancel {
+            background:#333;
+            color:white;
+            padding:12px 25px;
+            border-radius:8px;
+        }
+
+
+        .success {
+            background:rgba(45,106,79,.2);
+            border:1px solid rgba(45,106,79,.4);
+            color:#52c78f;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+            display:none;
+        }
+
+
+        @media(max-width:600px){
+            .form-grid{
+                grid-template-columns:1fr;
+            }
+
+            .field.full{
+                grid-column:auto;
+            }
+
+            .profile{
+                flex-wrap:wrap;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div>
+        <div class="title-small">Hồ sơ</div>
+        <h1>Thông tin tài khoản</h1>
+    </div>
+
+
+    <div class="success" id="success">
+        ✓ Thông tin đã được cập nhật thành công!
+    </div>
+
+
+    <div class="card profile">
+
+        <div class="avatar-box">
+            <div class="avatar" id="avatar">
+                N
+            </div>
+            <button class="camera">📷</button>
+        </div>
+
+
+        <div>
+            <h2 id="displayName">Nguyễn Thị Lan</h2>
+            <p id="displayEmail" style="color:#888">
+                lan.nguyen@email.com
+            </p>
+
+            <span class="member">
+        Thành viên Vàng
+    </span>
+        </div>
+
+
+        <button class="edit-btn" onclick="editMode()">
+            Chỉnh sửa
+        </button>
+
+    </div>
+
+
+
+    <div class="card">
+
+        <h3>Thông tin cá nhân</h3>
+
+
+        <div class="form-grid">
+
+
+            <div class="field">
+                <label>Họ và tên</label>
+                <input id="name" value="Nguyễn Thị Lan" disabled>
+            </div>
+
+
+            <div class="field">
+                <label>Email</label>
+                <input id="email" value="lan.nguyen@email.com" disabled>
+            </div>
+
+
+            <div class="field">
+                <label>Số điện thoại</label>
+                <input id="phone" value="0912 345 678" disabled>
+            </div>
+
+
+            <div class="field">
+                <label>Ngày sinh</label>
+                <input id="birthday" type="date" value="1995-08-15" disabled>
+            </div>
+
+
+            <div class="field full">
+                <label>Địa chỉ</label>
+                <input id="address" value="123 Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh" disabled>
+            </div>
+
+
+        </div>
+
+
+        <div class="actions" id="actions" style="display:none">
+
+            <button class="save" onclick="saveInfo()">
+                💾 Lưu
+            </button>
+
+            <button class="cancel" onclick="cancelEdit()">
+                Hủy
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+    let oldData={};
+
+
+    function editMode(){
+
+        let inputs=document.querySelectorAll("input");
+
+        inputs.forEach(i=>{
+            oldData[i.id]=i.value;
+            i.disabled=false;
+        });
+
+
+        document.getElementById("actions").style.display="flex";
+
+    }
+
+
+
+    function cancelEdit(){
+
+        document.querySelectorAll("input").forEach(i=>{
+            i.value=oldData[i.id];
+            i.disabled=true;
+        });
+
+
+        document.getElementById("actions").style.display="none";
+
+    }
+
+
+
+    function saveInfo(){
+
+        document.querySelectorAll("input").forEach(i=>{
+            i.disabled=true;
+        });
+
+
+        document.getElementById("actions").style.display="none";
+
+
+        document.getElementById("displayName").innerText=
+            document.getElementById("name").value;
+
+
+        document.getElementById("displayEmail").innerText=
+            document.getElementById("email").value;
+
+
+        document.getElementById("avatar").innerText=
+            document.getElementById("name").value.charAt(0);
+
+
+
+        let box=document.getElementById("success");
+
+        box.style.display="block";
+
+
+        setTimeout(()=>{
+            box.style.display="none";
+        },3000);
+
+    }
+
+
+</script>
+
+
+</body>
+</html>

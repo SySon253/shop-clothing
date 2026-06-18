@@ -12,9 +12,10 @@ import vn.com.shop.dto.response.ResponsePage;
 import java.util.List;
 
 public interface IProductService {
-    ResponsePage<List<ProductResponseDTO>> getAllProduct(ProductRequestFilter requestFilter, Pageable pageable);
+    ResponsePage<ProductResponseDTO> getAllProduct(ProductRequestFilter requestFilter, Pageable pageable);
     ProductResponseDTO getProductByName(String name);
     ProductResponseDTO createProduct(ProductCreateDTO request);
     ProductResponseDTO updateProduct(Long id, ProductUpdateDTO request);
     void deleteProduct(Long id);
+    ProductResponseDTO getProductById(Long id);
 }

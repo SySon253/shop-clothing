@@ -3,7 +3,9 @@ package vn.com.shop.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.shop.dto.product.ProductCreateDTO;
 import vn.com.shop.dto.product.ProductResponseDTO;
 import vn.com.shop.dto.product.ProductUpdateDTO;
@@ -30,10 +32,9 @@ public class ProductServiceImpl implements IProductService {
     @Autowired
     private ProductMapper productMapper;
     @Override
-    public ResponsePage<List<ProductResponseDTO>> getAllProduct(ProductRequestFilter requestFilter, Pageable pageable) {
-
+    public ResponsePage<ProductResponseDTO> getAllProduct(ProductRequestFilter requestFilter, Pageable pageable) {
         // Query database
-        Page<ProductEntity> page = productRepository.findAll(pageable);
+        Page<ProductEntity> page = productRepository.findAllByDeletedFalse(pageable);
 
         List<ProductEntity> productEntities = page.getContent();
 
@@ -46,7 +47,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         // Set response
-        ResponsePage<List<ProductResponseDTO>> responsePage = new ResponsePage<>();
+        ResponsePage<ProductResponseDTO> responsePage = new ResponsePage<>();
 
         responsePage.setContent(productDTOs);
         responsePage.setPageNumber(pageable.getPageNumber());
@@ -95,11 +96,49 @@ public class ProductServiceImpl implements IProductService {
         return productMapper.entityToDto(productEntity);
     }
 
-    @Override
-    public void deleteProduct(Long id) {
-        ProductEntity productEntity = productRepository.findById(id).orElseThrow(() -> new RuntimeException("product not found"));
+//    @Override
+//    public void deleteProduct(Long id) {
+//        ProductEntity productEntity = productRepository.findById(id).orElseThrow(() -> new RuntimeException("product not found"));
+//
+//        productEntity.setDeleted(true);
+//        productRepository.save(productEntity);
+//    }
+@Override
+@Transactional
+public void deleteProduct(Long id) {
 
-        productEntity.setDeleted(true);
-        productRepository.save(productEntity);
+    ProductEntity product =
+            productRepository.findById(id)
+                    .orElseThrow(() ->
+                            new RuntimeException("product not found")
+                    );
+
+
+    product.setDeleted(true);
+
+
+    product.getVariants()
+            .forEach(variant ->
+                    variant.setDeleted(true)
+            );
+
+
+    product.getImages()
+            .forEach(image ->
+                    image.setDeleted(true)
+            );
+
+
+}
+
+    @Override
+    public ProductResponseDTO getProductById(Long id) {
+        ProductEntity product = productRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy sản phẩm")
+                );
+
+        return productMapper.entityToDto(product);
     }
 }

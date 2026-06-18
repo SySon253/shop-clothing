@@ -1,3 +1,4 @@
+let editingProductId = null;
 async function loadProducts() {
 
     try {
@@ -92,17 +93,18 @@ function renderProducts(products) {
 
                 <td>
                     <div class="action-buttons">
-
-                        <button
-                            class="btn btn-warning btn-sm"
-                            onclick="editProduct(${JSON.stringify(product)})">
-                            Sửa
+                        
+                        <button class="btn btn-warning btn-sm"
+                        onclick="editProduct(${product.id})">
+                        Sửa
                         </button>
-
-                        <button
-                            class="btn btn-danger btn-sm"
-                            onclick="deleteProduct(${product.id})">
-                            Xóa
+                        
+                        <button 
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteProduct(${product.id})">
+                        
+                        Xóa
+                        
                         </button>
 
                     </div>
@@ -183,11 +185,25 @@ async function saveProduct(event){
             createBy: "admin",
             lastModifiedBy: "admin"
         };
+        if(editingProductId){
 
+            url =
+                `http://localhost:8080/api/products/id/${editingProductId}`;
 
-        const productResponse = await fetch("http://localhost:8080/api/products",
+            method = "PATCH";
+
+        }
+        else{
+
+            url =
+                "http://localhost:8080/api/products";
+
+            method = "POST";
+
+        }
+        const productResponse = await fetch(url,
             {
-                method:"POST",
+                method:method,
                 headers:{
                     "Content-Type":"application/json"
                 },
@@ -269,59 +285,125 @@ async function saveProduct(event){
     }
 }
 
-// function editProduct(product) {
-//
-//     editingProductId = product.id;
-//
-//     document.getElementById("modalTitle").innerText =
-//         "Cập nhật sản phẩm";
-//
-//
-//     document.getElementById("productName").value =
-//         product.name || "";
-//
-//
-//     document.getElementById("productBrand").value =
-//         product.brand || "";
-//
-//
-//     document.getElementById("productDescription").value =
-//         product.description || "";
-//
-//
-//     document.getElementById("productCategory").value =
-//         product.category?.id || "";
-//
-//
-//     // variant đầu tiên
-//     const variant =
-//         product.variants && product.variants.length > 0
-//             ? product.variants[0]
-//             : null;
-//
-//
-//     if(variant){
-//
-//         document.getElementById("productSKU").value =
-//             variant.sku || "";
-//
-//
-//         document.getElementById("productPrice").value =
-//             variant.price || 0;
-//
-//
-//         document.getElementById("productStock").value =
-//             variant.stock || 0;
-//
-//
-//         document.getElementById("productSize").value =
-//             variant.size || "";
-//
-//
-//         document.getElementById("productColor").value =
-//             variant.color || "";
-//     }
-//
-//
-//     openModal();
-// }
+async function editProduct(id){
+
+    try {
+
+        const response = await fetch(
+            `http://localhost:8080/api/products/id/${id}`
+        );
+
+
+        if(!response.ok){
+            throw new Error("Không lấy được sản phẩm");
+        }
+
+
+        const product = await response.json();
+
+
+        console.log(product);
+
+
+        // lưu id để khi bấm Lưu biết đang update
+        editingProductId = product.id;
+
+
+        // đổi tiêu đề modal
+        document.getElementById("modalTitle").innerText =
+            "Chỉnh sửa sản phẩm";
+
+
+        // đổ dữ liệu vào form
+
+        document.getElementById("productName").value =
+            product.name || "";
+
+
+        document.getElementById("productBrand").value =
+            product.brand || "";
+
+
+        document.getElementById("productDescription").value =
+            product.description || "";
+
+
+        document.getElementById("productCategory").value =
+            product.category.id;
+
+
+
+        // lấy variant đầu tiên
+
+        if(product.variants && product.variants.length > 0){
+
+            const variant = product.variants[0];
+
+
+            document.getElementById("productSKU").value =
+                variant.sku || "";
+
+
+            document.getElementById("productPrice").value =
+                variant.price || 0;
+
+
+            document.getElementById("productStock").value =
+                variant.stock || 0;
+
+
+            document.getElementById("productSize").value =
+                variant.size || "";
+
+
+            document.getElementById("productColor").value =
+                variant.color || "";
+        }
+
+
+
+        // mở modal
+        openModal();
+
+
+    }catch(error){
+
+        console.error(error);
+        alert("Không thể mở sản phẩm");
+
+    }
+
+}
+function openModal(){
+    document.getElementById("productModal").style.display = "flex";
+}
+function closeModal(){
+    document.getElementById("productModal").style.display = "none";
+
+    editingProductId = null;
+}
+
+
+async function deleteProduct(id){
+
+    if(!confirm("Bạn có chắc muốn xóa?")){
+        return;
+    }
+
+
+    const response = await fetch(
+        `http://localhost:8080/api/products/${id}`,
+        {
+            method:"DELETE"
+        }
+    );
+
+
+    if(response.ok){
+
+        alert("Xóa thành công");
+
+        loadProducts();
+
+    }
+}

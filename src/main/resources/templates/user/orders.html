@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Lịch sử đơn hàng</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      background:#0d0d0d;
+      font-family:Inter,sans-serif;
+    }
+
+    .serif{
+      font-family:"Playfair Display",serif;
+    }
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div id="app"></div>
+
+
+
+<script>
+
+
+  const orders = [
+
+    {
+      id:"ORD001",
+      date:"16/06/2026",
+      total:850000,
+      status:"Đã giao",
+
+      items:[
+        {
+          name:"Áo khoác Luxury Black",
+          qty:1,
+          price:450000,
+          image:"https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3"
+        },
+        {
+          name:"Túi da cao cấp",
+          qty:1,
+          price:400000,
+          image:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa"
+        }
+      ]
+
+    },
+
+
+    {
+      id:"ORD002",
+      date:"10/06/2026",
+      total:1200000,
+      status:"Đang giao",
+
+      items:[
+        {
+          name:"Đồng hồ Premium",
+          qty:1,
+          price:1200000,
+          image:"https://images.unsplash.com/photo-1523170335258-f5ed11844a49"
+        }
+      ]
+
+    },
+
+
+    {
+      id:"ORD003",
+      date:"01/06/2026",
+      total:300000,
+      status:"Đã hủy",
+
+      items:[
+        {
+          name:"Ví da",
+          qty:1,
+          price:300000,
+          image:"https://images.unsplash.com/photo-1627123424574-724758594e93"
+        }
+      ]
+
+    }
+
+  ];
+
+
+
+  function fmt(number){
+    return number.toLocaleString("vi-VN")+" ₫";
+  }
+
+
+
+  const statusStyle = {
+
+    "Đang xử lý":{
+      bg:"rgba(201,168,76,.12)",
+      color:"#c9a84c",
+      icon:"package"
+    },
+
+    "Đang giao":{
+      bg:"rgba(59,130,246,.12)",
+      color:"#60a5fa",
+      icon:"truck"
+    },
+
+    "Đã giao":{
+      bg:"rgba(45,106,79,.15)",
+      color:"#52c78f",
+      icon:"circle-check"
+    },
+
+    "Đã hủy":{
+      bg:"rgba(192,57,43,.12)",
+      color:"#e74c3c",
+      icon:"circle-x"
+    }
+
+  };
+
+
+
+  let expanded=null;
+  let filter="Tất cả";
+
+
+  const statuses=[
+    "Tất cả",
+    "Đang xử lý",
+    "Đang giao",
+    "Đã giao",
+    "Đã hủy"
+  ];
+
+
+
+  function setFilter(value){
+
+    filter=value;
+    render();
+
+  }
+
+
+
+  function toggleOrder(id){
+
+    expanded = expanded===id ? null : id;
+    render();
+
+  }
+
+
+
+  function render(){
+
+
+    const app=document.getElementById("app");
+
+
+    const filtered =
+            filter==="Tất cả"
+                    ?
+                    orders
+                    :
+                    orders.filter(o=>o.status===filter);
+
+
+
+    app.innerHTML=`
+
+<div class="min-h-screen pt-20">
+
+<div class="max-w-4xl mx-auto px-6 py-16">
+
+
+<div class="mb-10">
+
+<p style="
+color:#c9a84c;
+font-size:.7rem;
+letter-spacing:.3em;
+text-transform:uppercase">
+Lịch sử
+</p>
+
+
+<h1 class="serif text-white text-4xl">
+Đơn mua của tôi
+</h1>
+
+</div>
+
+
+
+<div class="flex gap-2 flex-wrap mb-8">
+
+
+${statuses.map(s=>`
+
+<button
+onclick="setFilter('${s}')"
+class="px-4 py-2 rounded-full text-sm"
+
+style="
+background:${filter===s?"#c9a84c":"#161616"};
+color:${filter===s?"#0d0d0d":"#8a8a8a"};
+border:1px solid rgba(201,168,76,.1);
+font-weight:${filter===s?600:400}
+">
+
+${s}
+
+</button>
+
+`).join("")}
+
+
+</div>
+
+
+
+
+<div class="flex flex-col gap-4">
+
+
+${
+            filtered.length===0
+                    ?
+                    `
+<div class="text-center py-20 text-gray-400">
+Không có đơn hàng nào.
+</div>
+`
+                    :
+                    filtered.map(order=>{
+
+
+                      const sc=statusStyle[order.status];
+                      const open=expanded===order.id;
+
+
+
+                      return `
+
+
+<div class="rounded-xl overflow-hidden"
+style="
+background:#161616;
+border:1px solid rgba(201,168,76,.1)"
+>
+
+
+<button
+onclick="toggleOrder('${order.id}')"
+class="w-full px-6 py-5 flex justify-between text-left"
+>
+
+
+<div class="flex flex-wrap gap-6">
+
+
+<div>
+<p class="text-gray-500 text-xs">
+Mã đơn
+</p>
+
+<p class="text-white">
+${order.id}
+</p>
+
+</div>
+
+
+<div>
+<p class="text-gray-500 text-xs">
+Ngày đặt
+</p>
+
+<p class="text-white">
+${order.date}
+</p>
+</div>
+
+
+
+<div>
+
+<p class="text-gray-500 text-xs">
+Tổng tiền
+</p>
+
+<p style="color:#c9a84c">
+${fmt(order.total)}
+</p>
+
+</div>
+
+
+
+<span
+class="px-3 py-1 rounded-full text-xs flex items-center gap-2"
+style="
+background:${sc.bg};
+color:${sc.color}
+">
+
+<i data-lucide="${sc.icon}" width="14"></i>
+
+${order.status}
+
+</span>
+
+
+
+</div>
+
+
+<i data-lucide="chevron-down"
+style="
+color:#8a8a8a;
+transform:${open?"rotate(180deg)":"none"}">
+</i>
+
+
+</button>
+
+
+
+
+
+${
+                              open
+                                      ?
+                                      `
+
+<div
+class="px-6 py-5"
+style="
+border-top:1px solid rgba(201,168,76,.1)"
+>
+
+
+<p class="text-gray-500 text-xs mb-4">
+SẢN PHẨM ĐÃ MUA
+</p>
+
+
+
+<div class="flex flex-col gap-3">
+
+
+${order.items.map(item=>`
+
+<div class="flex items-center gap-4">
+
+
+<img
+src="${item.image}"
+class="w-14 h-14 rounded-lg object-cover">
+
+
+<div class="flex-1">
+
+<p class="text-white serif">
+${item.name}
+</p>
+
+<p class="text-gray-500 text-sm">
+Số lượng: ${item.qty}
+</p>
+
+</div>
+
+
+<p style="color:#c9a84c">
+${fmt(item.price*item.qty)}
+</p>
+
+
+</div>
+
+
+`).join("")}
+
+
+</div>
+
+
+
+<div class="flex justify-between mt-5 pt-5"
+style="
+border-top:1px solid rgba(201,168,76,.1)"
+>
+
+
+<div class="flex gap-3">
+
+
+${
+                                              order.status==="Đã giao"
+                                                      ?
+                                                      `
+<button class="px-4 py-2 rounded-lg text-sm"
+style="
+background:rgba(201,168,76,.12);
+color:#c9a84c">
+Đánh giá sản phẩm
+</button>
+
+<button class="px-4 py-2 rounded-lg text-sm"
+style="
+background:#1e1e1e;
+color:white">
+Mua lại
+</button>
+`
+                                                      :""
+                                      }
+
+
+
+${
+                                              order.status==="Đang xử lý"
+                                                      ?
+                                                      `
+<button class="px-4 py-2 rounded-lg text-sm"
+style="
+background:rgba(192,57,43,.12);
+color:#e74c3c">
+Hủy đơn
+</button>
+`
+                                                      :""
+                                      }
+
+
+
+
+${
+                                              order.status==="Đang giao"
+                                                      ?
+                                                      `
+<button class="px-4 py-2 rounded-lg text-sm"
+style="
+background:rgba(59,130,246,.12);
+color:#60a5fa">
+Theo dõi vận chuyển
+</button>
+`
+                                                      :""
+                                      }
+
+
+</div>
+
+
+<p class="text-gray-500 text-sm">
+${order.items.length} sản phẩm
+</p>
+
+
+</div>
+
+
+</div>
+
+`
+                                      :""
+
+                      }
+
+
+</div>
+
+
+`;
+
+
+                    }).join("")
+    }
+
+
+</div>
+
+
+</div>
+
+</div>
+
+`;
+
+    lucide.createIcons();
+
+  }
+
+
+
+  render();
+
+
+</script>
+
+</body>
+</html>

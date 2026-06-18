@@ -2,15 +2,17 @@ package vn.com.shop.dto.product;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class ProductVariantRequestDTO {
     private Long productId;
 
     private String sku;
 
-    private Double price;
+    private BigDecimal price;
 
-    private Double discountPrice;
+    private BigDecimal discountPrice;
 
     private Integer stock;
 

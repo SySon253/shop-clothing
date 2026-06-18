@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements ICategoryService {
     private CategoryMapper categoryMapper;
 
     @Override
-    public ResponsePage<List<CategoryResponseDTO>> getAllCategories(CategoryRequestFilter requestFilter, Pageable pageable) {
+    public ResponsePage<CategoryResponseDTO> getAllCategories(CategoryRequestFilter requestFilter, Pageable pageable) {
         Page<CategoryEntity> page = categoryRepository.findAll(pageable);
         List<CategoryEntity> categoryEntities = page.getContent();
         List<CategoryResponseDTO> categoryResponseDTOS = new ArrayList<>();
@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements ICategoryService {
             CategoryResponseDTO categoryResponseDTO = categoryMapper.entityToDto(categoryEntity);
             categoryResponseDTOS.add(categoryResponseDTO);
         }
-        ResponsePage<List<CategoryResponseDTO>> responsePage = new ResponsePage<>();
+        ResponsePage<CategoryResponseDTO> responsePage = new ResponsePage<>();
         responsePage.setContent(categoryResponseDTOS);
         responsePage.setPageNumber(pageable.getPageNumber());
         responsePage.setPageSize(pageable.getPageSize());

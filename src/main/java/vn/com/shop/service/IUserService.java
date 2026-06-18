@@ -10,7 +10,7 @@ import vn.com.shop.dto.user.UserUpdateDTO;
 import java.util.List;
 
 public interface IUserService {
-    ResponsePage<List<UserResponseDTO>> getAllUsers(UserRequestFilter userRequestFilter, Pageable pageable);
+    ResponsePage<UserResponseDTO> getAllUsers(UserRequestFilter userRequestFilter, Pageable pageable);
     List<UserResponseDTO> getUserByName(String username);
     UserResponseDTO createUser(UserCreateDTO userCreateDTO);
     UserResponseDTO updateUser(Long userId, UserUpdateDTO userUpdateDTO);

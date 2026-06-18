@@ -21,7 +21,7 @@ public class CategoryResourceController {
     private final ICategoryService categoryService;
 
     @PostMapping("/all-category")
-    public ResponseEntity<ResponsePage<List<CategoryResponseDTO>>> getAllCategory(@RequestBody(required = false) CategoryRequestFilter requestFilter, Pageable pageable) {
+    public ResponseEntity<ResponsePage<CategoryResponseDTO>> getAllCategory(@RequestBody(required = false) CategoryRequestFilter requestFilter, Pageable pageable) {
         if (requestFilter == null) {
             requestFilter = new CategoryRequestFilter();
         }

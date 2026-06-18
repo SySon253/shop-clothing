@@ -1,9 +1,10 @@
 package vn.com.shop.entity;
 
 public enum OrderStatus {
-    PENDING,
+    WAITING_PAYMENT,
+    PAID,
     CONFIRMED,
     SHIPPING,
-    DELIVERED,
+    COMPLETED,
     CANCELLED
 }

@@ -11,13 +11,32 @@ import java.util.Optional;
 
 // là interface được kế thừa từ JpaRespository
 
-@Repository // để spring boot biết đây là interface repository và tự động tạo và quản lý bean
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+@Repository
+public interface UserRepository
+        extends JpaRepository<UserEntity, Long> {
+
+
     @Query("""
-        SELECT u FROM UserEntity u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))
+        SELECT u FROM UserEntity u 
+        WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))
     """)
-    List<UserEntity> findByUsername(@Param("username") String username);
-    boolean existsByUsername(String username);
-    boolean existsByEmail(String email);
+    List<UserEntity> searchByUsername(
+            @Param("username") String username
+    );
+
+
+    Optional<UserEntity> findFirstByUsername(
+            String username
+    );
+
+
+    boolean existsByUsername(
+            String username
+    );
+
+
+    boolean existsByEmail(
+            String email
+    );
 
 }

@@ -28,7 +28,7 @@ public class UserServiceImpl implements IUserService {
     private UserMapper userMapper;
 
     @Override
-    public ResponsePage<List<UserResponseDTO>> getAllUsers(UserRequestFilter userRequestFilter, Pageable pageable) {
+    public ResponsePage<UserResponseDTO> getAllUsers(UserRequestFilter userRequestFilter, Pageable pageable) {
         Page<UserEntity> page = userRepository.findAll(pageable);
         List<UserEntity> users = page.getContent();
         List<UserResponseDTO> userResponseDTOs = new ArrayList<>();
@@ -36,7 +36,7 @@ public class UserServiceImpl implements IUserService {
             UserResponseDTO userResponseDTO = userMapper.entityToDto(user);
             userResponseDTOs.add(userResponseDTO);
         }
-        ResponsePage<List<UserResponseDTO>> responsePage = new ResponsePage<>();
+        ResponsePage<UserResponseDTO> responsePage = new ResponsePage<>();
 
         responsePage.setContent(userResponseDTOs);
         responsePage.setPageNumber(pageable.getPageNumber());
@@ -51,7 +51,7 @@ public class UserServiceImpl implements IUserService {
         if (username == null || username.trim().isEmpty()) {
             throw new RuntimeException("Username cannot be null or empty");
         }
-        List<UserEntity> users = userRepository.findByUsername(username);
+        List<UserEntity> users = userRepository.searchByUsername(username);
         return users.stream().map(userMapper::entityToDto).toList();
     }
 

@@ -21,7 +21,7 @@ public class UserResourceController {
     private final IUserService userService;
 
     @PostMapping("/all-user")
-    public ResponseEntity<ResponsePage<List<UserResponseDTO>>> getAllUser(
+    public ResponseEntity<ResponsePage<UserResponseDTO>> getAllUser(
             @RequestBody(required = false) UserRequestFilter userRequestFilter,
             Pageable pageable
             ) {
