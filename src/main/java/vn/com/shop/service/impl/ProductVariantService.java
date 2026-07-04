@@ -2,6 +2,7 @@ package vn.com.shop.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.shop.dto.product.ProductVariantCreateDTO;
 import vn.com.shop.dto.product.ProductVariantRequestDTO;
 import vn.com.shop.dto.product.ProductVariantResponseDTO;
@@ -113,5 +114,37 @@ public class ProductVariantService implements IProductVariantService {
         variant.setDeleted(true);
 
         productVariantRepository.save(variant);
+    }
+    @Transactional
+    public void decreaseStock(
+            Long variantId,
+            Integer quantity
+    ){
+
+        ProductVariantEntity variant =
+                productVariantRepository
+                        .findById(variantId)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Variant không tồn tại")
+                        );
+
+
+        if(variant.getStock() < quantity){
+
+            throw new RuntimeException(
+                    "Không đủ tồn kho"
+            );
+
+        }
+
+
+        variant.setStock(
+                variant.getStock() - quantity
+        );
+
+
+        productVariantRepository.save(variant);
+
     }
 }

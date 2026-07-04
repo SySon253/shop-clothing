@@ -19,13 +19,11 @@ import vn.com.shop.mapper.OrderMapper;
 import vn.com.shop.repository.*;
 import vn.com.shop.service.IOrderService;
 import vn.com.shop.service.IVNPayService;
+import vn.com.shop.specification.OrderSpecification;
 
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -34,211 +32,557 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class OrderServiceImpl implements IOrderService {
+
+
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
     private final OrderMapper orderMapper;
+
     private final PaymentRepository paymentRepository;
+
     private final IVNPayService vnPayService;
+
     private final ProductVariantRepository productVariantRepository;
+
     private final UserRepository userRepository;
 
 
+    // =====================================================
+    // CREATE ORDER
+    // =====================================================
+
     @Override
-    public OrderCreateResponseDTO createOrder(OrderRequestDTO request) {
+    public OrderCreateResponseDTO createOrder(
+            OrderRequestDTO request
+    ) {
+        System.out.println("===== CREATE ORDER CONTROLLER =====");
+        System.out.println("=================");
+        System.out.println("receiverName = "
+                + request.getReceiverName());
 
-        System.out.println("========== CREATE ORDER ==========");
-        System.out.println("CartItemIds = " + request.getCartItemIds());
+        System.out.println("phone = "
+                + request.getPhone());
 
+        System.out.println("address = "
+                + request.getAddress());
+
+        System.out.println("=================");
+        System.out.println(
+                "========== CREATE ORDER =========="
+        );
         UserEntity user = getCurrentUser();
-
         CartEntity cart = cartRepository
-                .findByUserId(user.getId())
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy giỏ hàng")
-                );
-
-
-        if (request.getCartItemIds() == null ||
-                request.getCartItemIds().isEmpty()) {
-
+                        .findByUserId(
+                                user.getId()
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Không tìm thấy cart"
+                                        )
+                        );
+        if(request.getCartItemIds()==null || request.getCartItemIds().isEmpty()){
             throw new RuntimeException(
-                    "Chưa chọn sản phẩm thanh toán"
+                    "Chưa chọn sản phẩm checkout"
             );
+
         }
-
-
+        // lấy các sản phẩm được chọn
         Set<CartItemEntity> selectedItems =
                 cart.getItems()
                         .stream()
-                        .filter(item ->
-                                request.getCartItemIds()
-                                        .contains(item.getId())
+                        .filter(
+                                item ->
+                                        request
+                                                .getCartItemIds()
+                                                .contains(item.getId())
                         )
-                        .collect(Collectors.toSet());
-
-
-        if (selectedItems.isEmpty()) {
+                        .collect(
+                                Collectors.toSet()
+                        );
+        if(selectedItems.isEmpty()){
             throw new RuntimeException(
-                    "Không tìm thấy sản phẩm checkout"
+                    "Không tìm thấy sản phẩm"
             );
         }
-
-
+        // =================================================
+        // CREATE ORDER
+        // =================================================
         OrderEntity order = new OrderEntity();
-
         order.setUser(user);
         order.setReceiverName(request.getReceiverName());
         order.setPhone(request.getPhone());
         order.setAddress(request.getAddress());
         order.setPaymentMethod(request.getPaymentMethod());
         order.setStatus(OrderStatus.WAITING_PAYMENT);
-
-
-        Set<OrderItemEntity> orderItems = new HashSet<>();
-
+        List<OrderItemEntity> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
+        // =================================================
+        // COPY CART -> ORDER ITEM
+        // =================================================
 
 
-        for (CartItemEntity cartItem : selectedItems) {
+        for(
+                CartItemEntity cartItem:
+                selectedItems
+        ){
 
-            System.out.println("======================");
-            System.out.println("CartItem ID: " + cartItem.getId());
-            System.out.println("Product: " + cartItem.getVariant().getProduct().getName());
-            System.out.println("Price: " + cartItem.getVariant().getPrice());
-            System.out.println("Quantity: " + cartItem.getQuantity());
-            System.out.println("======================");
 
-            ProductVariantEntity variant = cartItem.getVariant();
-            if (variant.getStock() < cartItem.getQuantity()) {
+
+            ProductVariantEntity variant =
+                    cartItem.getVariant();
+
+            // check stock
+
+            if(
+                    variant.getStock()
+                            <
+                            cartItem.getQuantity()
+            ){
 
                 throw new RuntimeException(
-                        "Sản phẩm " + variant.getProduct().getName() + " không đủ tồn kho"
+                        "Sản phẩm "
+                                +
+                                variant.getProduct().getName()
+                                +
+                                " không đủ tồn kho"
                 );
-            }
-            OrderItemEntity orderItem = new OrderItemEntity();
-            orderItem.setOrder(order);
-            orderItem.setProductName(variant.getProduct().getName());
-            orderItem.setSku(variant.getSku());
-            orderItem.setSize(variant.getSize());
-            orderItem.setColor(variant.getColor());
-            BigDecimal checkoutPrice =
-                    variant.getDiscountPrice() != null
-                            ? variant.getDiscountPrice()
-                            : variant.getPrice();
 
-            orderItem.setPrice(checkoutPrice);
-            orderItem.setQuantity(cartItem.getQuantity());
+            }
+
+            OrderItemEntity orderItem =
+                    new OrderItemEntity();
+
+            orderItem.setProductVariant(
+                    variant
+            );
+
+            // lưu cartItemId
+            orderItem.setCartItemId(
+                    cartItem.getId()
+            );
+
+
+
+            orderItem.setOrder(
+                    order
+            );
+
+
+
+            orderItem.setProductName(
+                    cartItem.getVariant()
+                            .getProduct()
+                            .getName()
+            );
+
+
+            orderItem.setSku(
+                    variant.getSku()
+            );
+
+
+            orderItem.setSize(
+                    variant.getSize()
+            );
+
+
+            orderItem.setColor(
+                    variant.getColor()
+            );
+
+
+
+            BigDecimal price =
+                    variant.getDiscountPrice()!=null
+                            ?
+                            variant.getDiscountPrice()
+                            :
+                            variant.getPrice();
+
+
+
+            orderItem.setPrice(
+                    price
+            );
+
+
+
+            orderItem.setQuantity(
+                    cartItem.getQuantity()
+            );
+
+
 
             BigDecimal itemTotal =
-                    checkoutPrice.multiply(
-                            BigDecimal.valueOf(cartItem.getQuantity())
+                    price.multiply(
+                            BigDecimal.valueOf(
+                                    cartItem.getQuantity()
+                            )
                     );
-            totalAmount = totalAmount.add(itemTotal);
-            System.out.println(
-                    "TOTAL AFTER ADD = "
-                            + totalAmount
+
+
+
+            totalAmount =
+                    totalAmount.add(
+                            itemTotal
+                    );
+
+
+
+            orderItems.add(
+                    orderItem
             );
 
-            orderItems.add(orderItem);
-            variant.setStock(
-                    variant.getStock()
-                            -
-                            cartItem.getQuantity()
-            );
-            productVariantRepository.save(variant);
         }
-        order.setItems(orderItems);
-        order.setTotalAmount(totalAmount);
-        System.out.println(
-                "TOTAL ORDER = " + totalAmount
+        order.setItems(
+                orderItems
         );
-        OrderEntity savedOrder = orderRepository.save(order);
-        PaymentEntity payment = new PaymentEntity();
-        payment.setOrder(savedOrder);
-        payment.setTransactionId(UUID.randomUUID().toString());
-        payment.setAmount(totalAmount.doubleValue());
-        payment.setPaymentMethod(request.getPaymentMethod().name());
-        payment.setPaymentStatus("PENDING");
-        paymentRepository.save(payment);
+
+
+        order.setTotalAmount(
+                totalAmount
+        );
+
+        // Lưu để lấy ID
+        OrderEntity savedOrder =
+                orderRepository.save(order);
+
+// Sinh mã đơn
+        savedOrder.setOrderCode(
+                String.format("ORD%06d", savedOrder.getId())
+        );
+
+// Lưu lại
+        savedOrder =
+                orderRepository.save(savedOrder);
+
+
+
+        // =================================================
+        // CREATE PAYMENT
+        // =================================================
+
+
+        PaymentEntity payment =
+                new PaymentEntity();
+
+
+        payment.setOrder(
+                savedOrder
+        );
+
+
+        payment.setTransactionId(
+                UUID.randomUUID()
+                        .toString()
+        );
+
+
+        payment.setAmount(
+                totalAmount.doubleValue()
+        );
+
+
+        payment.setPaymentMethod(
+                request
+                        .getPaymentMethod()
+                        .name()
+        );
+
+
+
+        payment.setPaymentStatus(
+                "PENDING"
+        );
+
+
+
+        paymentRepository.save(
+                payment
+        );
+
+
+
+
+
 
         String paymentUrl = null;
 
-        if(request.getPaymentMethod() == PaymentMethod.BANKING) {
-            System.out.println("======================");
-            System.out.println("PRODUCT TOTAL = " + totalAmount);
-            System.out.println("======================");
 
-            System.out.println("SEND VNPay = " + totalAmount);
-            paymentUrl = vnPayService.createPaymentUrl(
+
+        // =================================================
+        // BANKING
+        // =================================================
+
+        if(
+                request.getPaymentMethod()
+                        ==
+                        PaymentMethod.BANKING
+        ){
+            paymentUrl =
+                    vnPayService.createPaymentUrl(
                             savedOrder.getId(),
                             totalAmount
                     );
+        }
+        // =================================================
+        // COD
+        // =================================================
+        if(
+                request.getPaymentMethod()
+                        ==
+                        PaymentMethod.COD
+        ){
+            removeCartItems(
+                    cart,
+                    selectedItems
+            );
+            savedOrder.setStatus(
+                    OrderStatus.CONFIRMED
+            );
+            orderRepository.save(
+                    savedOrder
+            );
+        }
+        return OrderCreateResponseDTO
+                .builder()
 
-        }
-        if(request.getPaymentMethod() == PaymentMethod.COD) {
-            cart.getItems().removeAll(selectedItems);
-            cartRepository.save(cart);
-        }
-        return OrderCreateResponseDTO.builder()
-                .orderId(savedOrder.getId())
-                .paymentUrl(paymentUrl)
+                .orderId(
+                        savedOrder.getId()
+                )
+
+
+                .paymentUrl(
+                        paymentUrl
+                )
+
+
                 .order(
-                        orderMapper.entityToDto(savedOrder)
+                        orderMapper.entityToDto(
+                                savedOrder
+                        )
                 )
                 .build();
+
+
     }
+
     @Override
-    @Transactional(readOnly = true)
     public ResponsePage<OrderResponseDTO> getAllOrders(
-            OrderRequestFilter request,
+            OrderRequestFilter filter,
             Pageable pageable
     ) {
-        Page<OrderEntity> page = orderRepository.findAll(pageable);
-        List<OrderResponseDTO> orders =
-                page.getContent()
+
+
+        Page<OrderEntity> orderPage =
+                orderRepository.findAll(
+                        OrderSpecification.filter(filter),
+                        pageable
+                );
+
+
+        List<OrderResponseDTO> content =
+                orderPage
+                        .getContent()
                         .stream()
                         .map(orderMapper::entityToDto)
                         .toList();
 
-        return ResponsePage.<OrderResponseDTO>builder()
-                .content(orders)
-                .pageNumber(page.getNumber())
-                .pageSize(page.getSize())
-                .totalElements(page.getTotalElements())
-                .build();
+
+
+        return new ResponsePage<>(
+                orderPage.getNumber(),
+                orderPage.getSize(),
+                orderPage.getTotalElements(),
+                orderPage.getTotalPages(),
+                content
+        );
+
     }
+
+
+    // =====================================================
+    // VNPay CALLBACK SUCCESS
+    // =====================================================
+
+
+    @Override
+    public void completePayment(
+            Long orderId
+    ){
+        OrderEntity order =
+                orderRepository
+                        .findById(orderId)
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Không tìm thấy order"
+                                        )
+                        );
+
+
+
+
+        order.setStatus(
+                OrderStatus.CONFIRMED
+        );
+
+
+
+
+        CartEntity cart =
+                cartRepository
+                        .findByUserId(
+                                order
+                                        .getUser()
+                                        .getId()
+                        )
+                        .orElseThrow();
+
+
+
+
+        Set<Long> cartItemIds =
+                order
+                        .getItems()
+                        .stream()
+                        .map(
+                                OrderItemEntity::getCartItemId
+                        )
+                        .collect(
+                                Collectors.toSet()
+                        );
+
+
+
+
+
+        cart.getItems()
+                .removeIf(
+                        item ->
+                                cartItemIds
+                                        .contains(
+                                                item.getId()
+                                        )
+                );
+
+
+
+
+        cartRepository.save(
+                cart
+        );
+
+
+        orderRepository.save(
+                order
+        );
+
+    }
+
+
+
+
+
+
+    // =====================================================
+    // GET USER ORDERS
+    // =====================================================
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getMyOrders(){
+        UserEntity user = getCurrentUser();
+        List<OrderEntity> orders = orderRepository
+                        .findByUserId(user.getId());
+        System.out.println(
+                "CURRENT USER = "
+                        + user.getId()
+        );
+
+
+        System.out.println(
+                "ORDER SIZE = "
+                        + orders.size()
+        );
+        return orders.stream()
+                .map(orderMapper::entityToDto)
+                .toList();
+    }
+
+
+    // =====================================================
+    // REMOVE CART ITEMS
+    // =====================================================
+
+
+    private void removeCartItems(
+            CartEntity cart,
+            Set<CartItemEntity> items
+    ){
+
+
+        cart.getItems()
+                .removeAll(
+                        items
+                );
+
+
+        cartRepository.save(
+                cart
+        );
+
+    }
+
+
+
+
+
+
+    // =====================================================
+    // CURRENT USER
+    // =====================================================
+
+
     private UserEntity getCurrentUser(){
+
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+
+
+        if(authentication == null ||
+                !authentication.isAuthenticated()){
+
+            throw new RuntimeException(
+                    "User chưa đăng nhập"
+            );
+
+        }
+
+
+
+        String username =
+                authentication.getName();
+
+
+
         return userRepository
-                .findById(1L)
+                .findFirstByUsername(username)
                 .orElseThrow(
                         () ->
                                 new RuntimeException(
-                                        "Không tìm thấy user test"
+                                        "Không tìm thấy user"
                                 )
                 );
 
     }
-//    private UserEntity getCurrentUser() {
-//
-//        Authentication authentication =
-//                SecurityContextHolder
-//                        .getContext()
-//                        .getAuthentication();
-//
-//
-//        String username =
-//                authentication.getName();
-//
-//
-//        return userRepository
-//                .findByUsername(username)
-//                .orElseThrow(() ->
-//                        new RuntimeException(
-//                                "Không tìm thấy user"
-//                        )
-//                );
-//    }
-
 
 
 }

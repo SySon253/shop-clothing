@@ -1,5 +1,6 @@
 package vn.com.shop.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class ProductVariantController {
     private final IProductVariantService productVariantService;
     @PostMapping
     public ResponseEntity<ProductVariantResponseDTO> createVariant(
-            @RequestBody ProductVariantRequestDTO requestDTO){
+            @Valid @RequestBody ProductVariantRequestDTO requestDTO){
         return ResponseEntity.ok(productVariantService.createVariant(requestDTO));
     }
     @GetMapping("/{id}")
@@ -29,7 +30,7 @@ public class ProductVariantController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductVariantResponseDTO> updateVariant(@PathVariable Long id, @RequestBody ProductVariantRequestDTO requestDTO){
+    public ResponseEntity<ProductVariantResponseDTO> updateVariant(@PathVariable Long id,@Valid @RequestBody ProductVariantRequestDTO requestDTO){
         ProductVariantResponseDTO productVariantResponseDTO = productVariantService.updateVariant(id, requestDTO);
         return ResponseEntity.ok(productVariantResponseDTO);
     }

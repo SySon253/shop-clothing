@@ -1,7 +1,10 @@
 package vn.com.shop.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.shop.dto.cart.AddCartItemRequestDTO;
 import vn.com.shop.dto.cart.CartResponseDTO;
 import vn.com.shop.entity.*;
@@ -24,41 +27,159 @@ public class CartServiceImpl implements ICartService {
     private final CartMapper cartMapper;
 
     private UserEntity getCurrentUser() {
-        return userRepository.findById(1L).orElseThrow(() -> new RuntimeException("User Not Found"));
-    }
-    @Override
-    public CartResponseDTO getMyCart() {
-        UserEntity user = getCurrentUser();
-        CartEntity cart = cartRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Cart Not Found"));
-        return cartMapper.entityToDto(cart);
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+
+        String username = authentication.getName();
+
+
+        return userRepository
+                .findFirstByUsername(username)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "User Not Found"
+                        )
+                );
     }
 
-    @Override
-    public CartResponseDTO addToCart(AddCartItemRequestDTO addCartItemRequestDTO) {
-        UserEntity user = getCurrentUser();
-        CartEntity cart = cartRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Cart Not Found"));
-        ProductVariantEntity variant = productVariantRepository.findById(addCartItemRequestDTO.getVariantId()).orElseThrow(() -> new RuntimeException("Variant Not Found"));
-        if (variant.getStock() < addCartItemRequestDTO.getQuantity()){
-            throw new RuntimeException("Stock Not Enough");
-        }
-        Optional<CartItemEntity> existingItem = cartItemRepository.findByCartIdAndVariantId(cart.getId(),variant.getId());
-        if (existingItem.isPresent()){
-            CartItemEntity cartItemEntity = existingItem.get();
-            int newQuantity = cartItemEntity.getQuantity() + addCartItemRequestDTO.getQuantity();
-            if(newQuantity > variant.getStock()){
-                throw new RuntimeException("Not enough stock");
-            }
-            cartItemEntity.setQuantity(newQuantity);
-            cartItemRepository.save(cartItemEntity);
-        }else {
-            CartItemEntity cartItemEntity = new CartItemEntity();
-            cartItemEntity.setCart(cart);
-            cartItemEntity.setVariant(variant);
-            cartItemEntity.setQuantity(addCartItemRequestDTO.getQuantity());
-            cartItemRepository.save(cartItemEntity);
-        }
-        return cartMapper.entityToDto(cart);
+@Override
+public CartResponseDTO getMyCart() {
+
+    UserEntity user = getCurrentUser();
+
+
+    System.out.println(
+            "CURRENT USER: "
+                    + user.getUsername()
+                    + " ID: "
+                    + user.getId()
+    );
+
+
+    CartEntity cart =
+            cartRepository
+                    .findByUserId(user.getId())
+                    .orElseThrow(
+                            () -> new RuntimeException("Cart Not Found")
+                    );
+
+
+    System.out.println(
+            "CURRENT CART ID: "
+                    + cart.getId()
+    );
+
+
+    return cartMapper.entityToDto(cart);
+}
+@Override
+@Transactional
+public CartResponseDTO addToCart(
+        AddCartItemRequestDTO request
+) {
+
+    UserEntity user = getCurrentUser();
+
+
+    CartEntity cart =
+            cartRepository
+                    .findByUserId(user.getId())
+                    .orElseGet(() -> {
+
+                        CartEntity newCart =
+                                new CartEntity();
+
+                        newCart.setUser(user);
+
+                        return cartRepository.save(newCart);
+
+                    });
+
+
+
+
+    ProductVariantEntity variant =
+            productVariantRepository
+                    .findById(request.getVariantId())
+                    .orElseThrow(
+                            () -> new RuntimeException(
+                                    "Variant Not Found"
+                            )
+                    );
+
+
+    if(
+            variant.getStock()
+                    < request.getQuantity()
+    ){
+        throw new RuntimeException(
+                "Stock Not Enough"
+        );
     }
+
+
+
+    CartItemEntity item =
+            cartItemRepository
+                    .findByCartIdAndVariantId(
+                            cart.getId(),
+                            variant.getId()
+                    )
+                    .orElse(null);
+
+
+
+    if(item != null){
+
+        int quantity =
+                item.getQuantity()
+                        + request.getQuantity();
+
+
+        if(quantity > variant.getStock()){
+            throw new RuntimeException(
+                    "Not enough stock"
+            );
+        }
+
+
+        item.setQuantity(quantity);
+
+        cartItemRepository.save(item);
+
+    }
+    else{
+
+        CartItemEntity newItem =
+                new CartItemEntity();
+
+        newItem.setCart(cart);
+
+        newItem.setVariant(variant);
+
+        newItem.setQuantity(
+                request.getQuantity()
+        );
+
+
+        cartItemRepository.save(newItem);
+
+    }
+
+
+    CartEntity result =
+            cartRepository
+                    .findById(cart.getId())
+                    .orElseThrow();
+
+
+    return cartMapper.entityToDto(result);
+
+}
 
     @Override
     public CartResponseDTO updateCartItem(Long cartItemId, Integer quantity) {

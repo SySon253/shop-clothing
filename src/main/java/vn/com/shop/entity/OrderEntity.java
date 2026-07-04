@@ -6,7 +6,9 @@ import lombok.Setter;
 import vn.com.shop.dto.order.PaymentMethod;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,15 +18,15 @@ import java.util.Set;
 public class OrderEntity extends BaseEntity {
     @ManyToOne
     private UserEntity user;
-
+    @Column(unique = true)
+    private String orderCode;
     private String receiverName;
     private String phone;
     private String address;
     private BigDecimal totalAmount;
 
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderItemEntity> items = new HashSet<>();
+    private List<OrderItemEntity> items = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;

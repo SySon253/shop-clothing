@@ -17,5 +17,5 @@ public class OrderResponseDTO extends BaseResponseDTO {
     private String address;
     private BigDecimal totalAmount;
     private PaymentMethod paymentMethod;
-    private Set<OrderItemResponseDTO> items;
+    private List<OrderItemResponseDTO> items;
 }

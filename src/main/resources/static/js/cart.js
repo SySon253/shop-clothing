@@ -1,11 +1,6 @@
 const CART_API = "http://localhost:8080/api/carts";
-
-
 // tránh spam request
 let updatingItems = {};
-
-
-
 // ===============================
 // LOAD CART
 // ===============================
@@ -13,93 +8,39 @@ let updatingItems = {};
 document.addEventListener(
     "DOMContentLoaded",
     () => {
-
         loadCart();
-
     }
 );
-
-
-
-
-
 async function loadCart(){
-
-
     try{
-
-
         const response = await fetch(
             `${CART_API}/my-cart`
         );
-
-
         if(!response.ok){
-
             throw new Error(
                 "Cannot get cart"
             );
-
         }
-
-
-
-        const cart =
-            await response.json();
-
-
-
+        const cart = await response.json();
         renderCart(cart);
-
-
-
     }
     catch(error){
-
         console.error(error);
-
     }
-
-
 }
-
-
-
-
-
-
-
 // ===============================
 // RENDER CART
 // ===============================
-
-
 function renderCart(cart){
-
-
     const tbody =
         document.querySelector(
             "tbody.align-middle"
         );
-
-
-
     tbody.innerHTML = "";
-
-
-
     cart.items.forEach(item=>{
-
-
         tbody.innerHTML += `
-
-
         <tr data-id="${item.id}">
-
-
             <td class="align-middle">
-
-
     <input 
 type="checkbox"
 class="cart-checkbox"
@@ -107,95 +48,42 @@ data-id="${item.id}"
 data-price="${item.subtotal}"
 onchange="calculateSelectedCart()"
 >
-
-
-
     <img 
     src="/img/product-default.jpg"
     style="width:50px">
-
-
     <div>
-
         <strong>
         ${item.productName}
         </strong>
-
-
         <br>
-
-
         <small>
-
         Size:
         ${item.size}
-
         |
-
         Color:
         ${item.color}
-
         </small>
-
-
     </div>
-
-
 </td>
-
-
-
-
-
             <td class="align-middle price">
-
-
                 ${formatMoney(item.price)}
-
-
             </td>
-
-
-
-
-
-
             <td class="align-middle">
-
-
                 <div class="input-group quantity mx-auto"
                 style="width:100px">
-
-
-
                     <div class="input-group-btn">
-
-
-                        <button
-
+                       <button
                         class="btn btn-sm btn-primary"
-
                         onclick="
                         changeQuantity(
                             ${item.id},
                             -1,
                             this
                         )">
-
                         <i class="fa fa-minus"></i>
-
-
                         </button>
-
-
                     </div>
-
-
-
-
-
                     <input
-
                     class="
                     form-control
                     form-control-sm
@@ -203,21 +91,12 @@ onchange="calculateSelectedCart()"
                     text-center
                     quantity-input
                     "
-
                     value="${item.quantity}"
-
                     readonly>
-
-
-
-
-
 
                     <div class="input-group-btn">
 
-
                         <button
-
                         class="btn btn-sm btn-primary"
 
                         onclick="
@@ -229,38 +108,17 @@ onchange="calculateSelectedCart()"
 
 
                         <i class="fa fa-plus"></i>
-
-
                         </button>
-
-
                     </div>
 
-
-
                 </div>
-
-
-
             </td>
-
-
-
-
-
 
             <td class="align-middle subtotal">
 
-
                 ${formatMoney(item.subtotal)}
 
-
             </td>
-
-
-
-
-
 
 
             <td class="align-middle">
@@ -305,11 +163,6 @@ onchange="calculateSelectedCart()"
 
 
 }
-
-
-
-
-
 
 
 
@@ -475,11 +328,6 @@ async function changeQuantity(
 
 
 
-
-
-
-
-
 // ===============================
 // UPDATE ROW PRICE
 // ===============================
@@ -553,13 +401,7 @@ async function deleteCartItem(id){
 
     }
 
-
-
-
-
     try{
-
-
         const response =
             await fetch(
 
@@ -572,94 +414,50 @@ async function deleteCartItem(id){
                 }
 
             );
-
-
-
         if(response.ok){
 
             loadCart();
 
         }
-
-
-
     }
     catch(error){
 
         console.error(error);
 
     }
-
-
 }
-
-
-
-
-
-
 
 // ===============================
 // UPDATE SUMMARY
 // ===============================
-
-
 function updateSummary(totalPrice){
-
-
-
     const summary =
         document.querySelectorAll(
             ".card-body h6"
         );
-
-
-
     const shipping = 10000;
-
-
-
-
     if(summary.length >=2){
-
-
         summary[0]
             .innerText =
             formatMoney(
                 totalPrice
             );
-
-
-
         summary[1]
             .innerText =
             formatMoney(
                 shipping
             );
-
-
     }
-
-
-
-
     const total =
         document.querySelector(
             ".card-footer h5.font-weight-bold:last-child"
         );
-
-
-
     if(total){
-
         total.innerText =
             formatMoney(
                 totalPrice + shipping
             );
-
     }
-
-
 }
 
 

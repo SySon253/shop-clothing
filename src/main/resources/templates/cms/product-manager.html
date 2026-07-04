@@ -44,6 +44,9 @@
 
                     </tbody>
                 </table>
+                <div id="pagination"
+                     class="pagination">
+                </div>
             </div>
         </main>
     </div>
@@ -93,14 +96,14 @@
 
                     <div class="form-group">
                         <label>Giá</label>
-                        <input type="number" id="productPrice" required>
+                        <input type="number" id="productPrice" min="1" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tồn kho</label>
-                        <input type="number" id="productStock" required>
+                        <input type="number" id="productStock" min="0" required>
                     </div>
 
                     <div class="form-group">
@@ -108,19 +111,6 @@
                         <input type="text" id="productImage">
                     </div>
                 </div>
-
-<!--                <div class="form-row">-->
-<!--                    <div class="form-group">-->
-<!--                        <label>Giá giảm</label>-->
-<!--                        <input type="number" id="discountPrice">-->
-<!--                    </div>-->
-
-<!--                    <div class="form-group">-->
-<!--                        <label>Tồn giữ chỗ</label>-->
-<!--                        <input type="number" id="reservedStock" value="0">-->
-<!--                    </div>-->
-<!--                </div>-->
-
                 <div class="form-group">
                     <label>Mô tả</label>
                     <textarea id="productDescription"></textarea>
@@ -155,46 +145,11 @@
             document.getElementById('productModal').classList.add('show');
         }
 
-        // function editProduct(id, name, sku, category, price, stock) {
-        //     isEditMode = true;
-        //     editingId = id;
-        //     document.getElementById('modalTitle').textContent = 'Chỉnh sửa sản phẩm';
-        //     document.getElementById('productName').value = name;
-        //     document.getElementById('productSKU').value = sku;
-        //     document.getElementById('productCategory').value = category;
-        //     document.getElementById('productPrice').value = price;
-        //     document.getElementById('productStock').value = stock;
-        //     document.getElementById('productModal').classList.add('show');
-        // }
-
         function closeModal() {
             document.getElementById('productModal').classList.remove('show');
             document.getElementById('productForm').reset();
         }
 
-        // function saveProduct(event) {
-        //     event.preventDefault();
-        //     const name = document.getElementById('productName').value;
-        //     const sku = document.getElementById('productSKU').value;
-        //     const category = document.getElementById('productCategory').value;
-        //     const price = document.getElementById('productPrice').value;
-        //     const stock = document.getElementById('productStock').value;
-        //
-        //     if (isEditMode) {
-        //         alert('Cập nhật sản phẩm ' + name + ' thành công!');
-        //     } else {
-        //         alert('Thêm sản phẩm ' + name + ' thành công!');
-        //     }
-        //     closeModal();
-        // }
-
-        // function deleteProduct(id) {
-        //     if (confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) {
-        //         alert('Xóa sản phẩm thành công!');
-        //         // Remove row from table
-        //         event.target.closest('tr').remove();
-        //     }
-        // }
 
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {

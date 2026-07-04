@@ -1,28 +1,43 @@
 let editingProductId = null;
-async function loadProducts() {
+let editingVariantId = null;
+let editingImageId = null;
 
-    try {
+let currentPage = 0;
+let totalPages = 0;
+const pageSize = 10;
+async function loadProducts(){
+
+    try{
 
         const response = await fetch(
-            "http://localhost:8080/api/products/all-product?page=0&size=20",
+
+            `http://localhost:8080/api/products/all-product?page=${currentPage}&size=${pageSize}`,
+
             {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
                 },
-                body: JSON.stringify({})
+                body:JSON.stringify({})
             }
+
         );
 
         const result = await response.json();
 
-        console.log(result);
-
         renderProducts(result.content);
 
-    } catch (error) {
-        console.error(error);
+        totalPages = result.totalPages;
+
+        renderPagination();
+
     }
+    catch(error){
+
+        console.error(error);
+
+    }
+
 }
 
 function renderProducts(products) {
@@ -55,10 +70,26 @@ function renderProducts(products) {
         const category =
             product.category?.name || "-";
 
-        const status =
-            stock > 10
-                ? '<span class="badge badge-success">Còn hàng</span>'
-                : '<span class="badge badge-danger">Sắp hết</span>';
+        let status = "";
+
+        if (stock === 0) {
+
+            status =
+                '<span class="badge badge-dark">Hết hàng</span>';
+
+        }
+        else if (stock <= 10) {
+
+            status =
+                '<span class="badge badge-warning">Sắp hết</span>';
+
+        }
+        else {
+
+            status =
+                '<span class="badge badge-success">Còn hàng</span>';
+
+        }
 
         tbody.innerHTML += `
             <tr>
@@ -175,7 +206,61 @@ function createSlug(text){
 async function saveProduct(event){
     event.preventDefault();
     try{
+        const isEdit = editingProductId !== null;
         const productName = document.getElementById("productName").value;
+        const productName1 =
+            document.getElementById("productName").value.trim();
+
+        const sku =
+            document.getElementById("productSKU").value.trim();
+
+        const price =
+            Number(document.getElementById("productPrice").value);
+
+        const stock =
+            Number(document.getElementById("productStock").value);
+
+        const category =
+            document.getElementById("productCategory").value;
+
+// ===========================
+// Validate
+// ===========================
+
+        if(productName1 === ""){
+
+            alert("Tên sản phẩm không được để trống.");
+
+            return;
+        }
+
+        if(sku === ""){
+
+            alert("SKU không được để trống.");
+
+            return;
+        }
+
+        if(category === ""){
+
+            alert("Vui lòng chọn danh mục.");
+
+            return;
+        }
+
+        if(price <= 0){
+
+            alert("Giá phải lớn hơn 0.");
+
+            return;
+        }
+
+        if(stock < 0){
+
+            alert("Tồn kho không được nhỏ hơn 0.");
+
+            return;
+        }
         const productData = {
             name: document.getElementById("productName").value,
             slug: createSlug(productName),
@@ -235,49 +320,123 @@ async function saveProduct(event){
         };
         console.log("variantData =", variantData);
 
-        const variantResponse = await fetch(
-            "http://localhost:8080/api/product-variants",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(variantData)
-            }
-        );
+        let variantResponse;
 
-        if (!variantResponse.ok) {
 
-            console.log("status =", variantResponse.status);
+        if(editingVariantId){
 
-            const errorText = await variantResponse.text();
-
-            console.error(errorText);
-
-            throw new Error(errorText);
-        }
-
-        const imageUrl = document.getElementById("productImage").value;
-        if (imageUrl.trim() !== ""){
-            const imageData = {
-                productId: productId,
-                imageUrl: imageUrl,
-                thumbnail: true
-            };
-            const imageResponse = await fetch("http://localhost:8080/api/product-images",
+            variantResponse = await fetch(
+                `http://localhost:8080/api/product-variants/${editingVariantId}`,
                 {
-                    method: "POST",
+                    method:"PATCH",
                     headers:{
                         "Content-Type":"application/json"
                     },
-                    body: JSON.stringify(imageData)
-                });
-            if (!imageResponse.ok){
-                throw new Error("Tạo ảnh thất bại");
-            }
+                    body:JSON.stringify(variantData)
+                }
+            );
+
         }
-        alert("Thêm sản phẩm thành công");
+        else{
+
+            variantResponse = await fetch(
+                "http://localhost:8080/api/product-variants",
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify(variantData)
+                }
+            );
+
+        }
+        if (!variantResponse.ok) {
+
+            const error = await variantResponse.json();
+
+            throw new Error(error.message);
+
+        }
+        const imageUrl =
+            document.getElementById("productImage").value;
+
+        if(imageUrl.trim() !== ""){
+
+            const imageData = {
+
+                productId: productId,
+
+                imageUrl: imageUrl,
+
+                thumbnail: true
+
+            };
+
+            let imageResponse;
+
+            if(editingImageId){
+
+                imageResponse = await fetch(
+
+                    `http://localhost:8080/api/product-images/${editingImageId}`,
+
+                    {
+
+                        method:"PATCH",
+
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+
+                        body:JSON.stringify(imageData)
+
+                    }
+
+                );
+
+            }else{
+
+                imageResponse = await fetch(
+
+                    "http://localhost:8080/api/product-images",
+
+                    {
+
+                        method:"POST",
+
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+
+                        body:JSON.stringify(imageData)
+
+                    }
+
+                );
+
+            }
+
+            if(!imageResponse.ok){
+
+                throw new Error("Lưu ảnh thất bại");
+
+            }
+
+        }
+
+
+        if(isEdit){
+
+            alert("Cập nhật sản phẩm thành công");
+
+        }else{
+
+            alert("Thêm sản phẩm thành công");
+
+        }
         closeModal();
+
         loadProducts();
     }catch (error){
         console.log(error);
@@ -339,6 +498,8 @@ async function editProduct(id){
 
             const variant = product.variants[0];
 
+            editingVariantId = variant.id;
+
 
             document.getElementById("productSKU").value =
                 variant.sku || "";
@@ -360,7 +521,22 @@ async function editProduct(id){
                 variant.color || "";
         }
 
+        if(product.images && product.images.length > 0){
 
+            const image = product.images[0];
+
+            editingImageId = image.id;
+
+            document.getElementById("productImage").value =
+                image.imageUrl;
+
+        }else{
+
+            editingImageId = null;
+
+            document.getElementById("productImage").value = "";
+
+        }
 
         // mở modal
         openModal();
@@ -381,6 +557,8 @@ function closeModal(){
     document.getElementById("productModal").style.display = "none";
 
     editingProductId = null;
+    editingVariantId = null;
+    editingImageId = null;
 }
 
 
@@ -406,4 +584,120 @@ async function deleteProduct(id){
         loadProducts();
 
     }
+}
+
+function renderPagination(){
+
+    const pagination =
+        document.getElementById("pagination");
+
+    pagination.innerHTML = "";
+
+    for(let i = 0; i < totalPages; i++){
+
+        pagination.innerHTML +=
+
+            `
+                <button
+                    class="${i===currentPage ? 'active-page':''}"
+                    onclick="goToPage(${i})">
+
+                    ${i+1}
+
+                </button>
+            `;
+
+    }
+
+}
+function goToPage(page){
+
+    currentPage = page;
+
+    loadProducts();
+
+}
+
+function renderPagination(){
+
+    const pagination =
+        document.getElementById("pagination");
+
+    pagination.innerHTML="";
+
+    pagination.innerHTML +=
+
+        `
+        <button
+
+            onclick="previousPage()"
+
+            ${currentPage===0?"disabled":""}
+
+        >
+
+            <<
+
+        </button>
+
+    `;
+
+    for(let i=0;i<totalPages;i++){
+
+        pagination.innerHTML +=
+
+            `
+            <button
+
+                class="${currentPage===i?'active-page':''}"
+
+                onclick="goToPage(${i})">
+
+                ${i+1}
+
+            </button>
+
+        `;
+
+    }
+
+    pagination.innerHTML +=
+
+        `
+        <button
+
+            onclick="nextPage()"
+
+            ${currentPage===totalPages-1?"disabled":""}
+
+        >
+
+            >>
+
+        </button>
+
+    `;
+
+}
+function previousPage(){
+
+    if(currentPage>0){
+
+        currentPage--;
+
+        loadProducts();
+
+    }
+
+}
+function nextPage(){
+
+    if(currentPage<totalPages-1){
+
+        currentPage++;
+
+        loadProducts();
+
+    }
+
 }

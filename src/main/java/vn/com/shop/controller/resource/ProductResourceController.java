@@ -1,5 +1,6 @@
 package vn.com.shop.controller.resource;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class ProductResourceController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductCreateDTO productCreateDTO){
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductCreateDTO productCreateDTO){
         ProductResponseDTO productResponseDTO = productService.createProduct(productCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(productResponseDTO);
     }
@@ -48,7 +49,7 @@ public class ProductResourceController {
     }
 
     @PatchMapping("/id/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateDTO productUpdateDTO) {
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductUpdateDTO productUpdateDTO) {
         ProductResponseDTO productResponseDTO = productService.updateProduct(id, productUpdateDTO);
         return ResponseEntity.ok(productResponseDTO);
     }

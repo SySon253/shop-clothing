@@ -10,12 +10,27 @@ import java.math.BigDecimal;
 @Table(name = "cart_item")
 @Getter
 @Setter
-public class CartItemEntity extends BaseEntity{
+public class CartItemEntity extends BaseEntity {
+
+
     @ManyToOne
+    @JoinColumn(
+            name = "cart_id",
+            nullable = false
+    )
     private CartEntity cart;
 
+
+
     @ManyToOne
+    @JoinColumn(
+            name = "variant_id",
+            nullable = false
+    )
     private ProductVariantEntity variant;
 
+
+
     private Integer quantity;
+
 }

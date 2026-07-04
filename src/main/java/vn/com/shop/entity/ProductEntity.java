@@ -27,6 +27,7 @@ public class ProductEntity extends BaseEntity {
     @OneToMany(mappedBy = "product")
     private Set<ProductImageEntity> images;
 
+    @OrderBy("id ASC")
     @OneToMany(mappedBy = "product")
     private Set<ProductVariantEntity> variants;
 }

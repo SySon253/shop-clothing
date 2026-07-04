@@ -1,17 +1,24 @@
 const API_ORDER =
-    "http://localhost:8080/api/admin/orders";
+    "http://localhost:8080/api/orders/admin/orders";
 
 
 // lưu danh sách order hiện tại
 let orders = [];
 
+let currentPage = 0;
+
+let totalPages = 0;
+
+const pageSize = 10;
 
 // chạy khi load trang
 document.addEventListener(
     "DOMContentLoaded",
     function(){
 
+
         loadOrders();
+
 
 
         document
@@ -21,35 +28,49 @@ document.addEventListener(
                 searchOrders
             );
 
+
+
+        document
+            .getElementById("statusFilter")
+            .addEventListener(
+                "change",
+                function(){
+
+
+                    currentPage = 0;
+
+
+                    loadOrders();
+
+
+                }
+            );
+
+
     }
 );
-
-
-
 
 // ================================
 // FETCH API LẤY DANH SÁCH ORDER
 // ================================
-
 async function loadOrders(){
-
-
     try {
+        const status =
+            document
+                .getElementById("statusFilter")
+                .value;
+        let url =
+            `${API_ORDER}?page=${currentPage}&size=${pageSize}`;
+        if(status){
+
+            url += `&status=${status}`;
+
+        }
+
 
 
         const response =
-            await fetch(
-                `${API_ORDER}?page=0&size=10`
-            );
-
-
-        if(!response.ok){
-
-            throw new Error(
-                "Không lấy được danh sách đơn hàng"
-            );
-
-        }
+            await fetch(url);
 
 
 
@@ -58,34 +79,40 @@ async function loadOrders(){
 
 
 
+        console.log(
+            "DATA:",
+            data
+        );
+
+
         orders =
             data.content;
 
 
+        totalPages =
+            data.totalPages;
 
-        renderOrders(orders);
 
+
+        renderOrders(
+            orders
+        );
+
+
+        renderPagination();
 
 
     }
     catch(error){
 
-        console.error(error);
-
-        alert(
-            "Lỗi khi tải danh sách đơn hàng"
+        console.error(
+            "LOAD ORDER ERROR:",
+            error
         );
 
     }
 
 }
-
-
-
-
-
-
-
 // ================================
 // RENDER TABLE
 // ================================
@@ -106,7 +133,7 @@ function renderOrders(list){
 
     list.forEach(order => {
 
-
+        console.log(order.orderCode, typeof order.orderCode);
 
         const productNames =
             order.items
@@ -129,7 +156,7 @@ function renderOrders(list){
         tr.innerHTML = `
 
             <td>
-                #${order.id}
+                #${order.orderCode}
             </td>
 
 
@@ -169,7 +196,7 @@ function renderOrders(list){
 
                     <button 
                     class="btn btn-primary btn-sm"
-                    onclick="viewOrder(${order.id})">
+                    onclick="viewOrder('${order.orderCode}')">
 
                     Xem
 
@@ -256,66 +283,90 @@ function searchOrders(){
 // ================================
 // XEM CHI TIẾT ORDER
 // ================================
-
-
-function viewOrder(id){
-
+// function viewOrder(code){
+//     const order = orders.find(
+//         item => String(item.orderCode) === String(code)
+//     );
+//     if(!order)
+//         return;
+//
+//
+//
+//     document
+//         .getElementById("orderCode")
+//         .textContent =
+//         order.orderCode;
+//
+//
+//
+//     document
+//         .getElementById("orderCustomer")
+//         .textContent =
+//         order.receiverName;
+//
+//
+//
+//     document
+//         .getElementById("orderTotal")
+//         .textContent =
+//         formatMoney(order.totalAmount);
+//     document
+//         .getElementById("orderDate")
+//         .textContent =
+//         formatDate(order.createdDate);
+//
+//
+//     document
+//         .getElementById("orderModal")
+//         .classList
+//         .add("show");
+//
+//
+// }
+function viewOrder(code){
 
     const order =
         orders.find(
-            item => item.id === id
+            item => String(item.orderCode) === String(code)
         );
-
-
 
     if(!order)
         return;
 
+    document.getElementById("orderCode").textContent =
+        order.orderCode;
 
-
-    document
-        .getElementById("orderCode")
-        .textContent =
-        "#" + order.id;
-
-
-
-    document
-        .getElementById("orderCustomer")
-        .textContent =
+    document.getElementById("orderCustomer").textContent =
         order.receiverName;
 
-
-
-    document
-        .getElementById("orderDate")
-        .textContent =
+    document.getElementById("orderDate").textContent =
         formatDate(order.createdDate);
 
+    document.getElementById("orderTotal").textContent =
+        formatMoney(order.totalAmount);
 
+    const orderItems =
+        document.getElementById("orderItems");
 
-    document
-        .getElementById("orderTotal")
-        .textContent =
-        formatMoney(
-            order.totalAmount
-        );
+    orderItems.innerHTML = "";
 
+    order.items.forEach(item => {
 
+        const li =
+            document.createElement("li");
+
+        li.textContent =
+            `${item.productName} x ${item.quantity}`;
+
+        orderItems.appendChild(li);
+
+    });
 
     document
         .getElementById("orderModal")
         .classList
         .add("show");
-
-
 }
-
-
-
-
-
-
 // ================================
 // FORMAT MONEY
 // ================================
@@ -378,5 +429,71 @@ function closeModal(){
         )
         .classList
         .remove("show");
+
+}
+function renderPagination(){
+
+
+    const pagination =
+        document.getElementById(
+            "pagination"
+        );
+
+
+    pagination.innerHTML = "";
+
+
+
+    for(
+        let i = 0;
+        i < totalPages;
+        i++
+    ){
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.innerText =
+            i + 1;
+
+
+
+        button.className =
+            "btn btn-sm btn-outline-primary mx-1";
+
+
+
+        if(i === currentPage){
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+
+
+        button.onclick = function(){
+
+
+            currentPage = i;
+
+
+            loadOrders();
+
+
+        };
+
+
+
+        pagination.appendChild(
+            button
+        );
+
+    }
 
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -11,9 +12,23 @@ import java.util.Set;
 @Getter
 @Setter
 public class CartEntity extends BaseEntity {
+
+
     @OneToOne
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            unique = true
+    )
     private UserEntity user;
 
-    @OneToMany(mappedBy = "cart")
-    private Set<CartItemEntity> items;
+
+
+    @OneToMany(
+            mappedBy = "cart",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<CartItemEntity> items = new HashSet<>();
+
 }

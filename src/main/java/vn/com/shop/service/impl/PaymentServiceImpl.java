@@ -3,17 +3,17 @@ package vn.com.shop.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.com.shop.entity.CartEntity;
-import vn.com.shop.entity.OrderEntity;
-import vn.com.shop.entity.OrderStatus;
-import vn.com.shop.entity.PaymentEntity;
+import vn.com.shop.entity.*;
 import vn.com.shop.repository.CartRepository;
 import vn.com.shop.repository.OrderRepository;
 import vn.com.shop.repository.PaymentRepository;
+import vn.com.shop.repository.ProductVariantRepository;
 import vn.com.shop.service.IPaymentService;
 import vn.com.shop.service.IVNPayService;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class PaymentServiceImpl implements IPaymentService {
 
     private final IVNPayService vnPayService;
     private final CartRepository cartRepository;
+    private final ProductVariantRepository productVariantRepository;
     @Override
     public String handleVNPayCallback(
             Map<String,String> params
@@ -49,12 +50,6 @@ public class PaymentServiceImpl implements IPaymentService {
 
 
         }
-
-
-
-
-
-
 
         // =========================
         // 2. Lấy orderId
@@ -83,116 +78,91 @@ public class PaymentServiceImpl implements IPaymentService {
                         );
 
 
-
-
-
-
-
         // =========================
         // 3. Kiểm tra kết quả VNPay
         // =========================
+        String responseCode = params.get("vnp_ResponseCode");
+
+        OrderEntity order = payment.getOrder();
+        if(OrderStatus.PAID.equals(order.getStatus())){
+
+            return "ALREADY_PAID";
+
+        }
+        if("00".equals(responseCode)){
+            // Thanh toán thành công
+            payment.setPaymentStatus("SUCCESS");
+            payment.setTransactionId(params.get("vnp_TransactionNo"));
+            order.setStatus(OrderStatus.PAID);
+            // =========================
+            // GIẢM TỒN KHO
+            // =========================
+
+            for(OrderItemEntity item : order.getItems()){
 
 
-        String responseCode =
-                params.get(
-                        "vnp_ResponseCode"
+                ProductVariantEntity variant =
+                        item.getProductVariant();
+
+
+                if(variant.getStock() < item.getQuantity()){
+
+                    throw new RuntimeException(
+                            "Không đủ tồn kho"
+                    );
+
+                }
+
+
+                variant.setStock(
+                        variant.getStock()
+                                - item.getQuantity()
                 );
 
 
+                productVariantRepository.save(
+                        variant
+                );
 
-
-
-        OrderEntity order =
-                payment.getOrder();
-
-
-
-
-
-
-        if(
-                "00".equals(responseCode)
-        ){
-
-
-
-            // Thanh toán thành công
-
-
-            payment.setPaymentStatus(
-                    "SUCCESS"
-            );
-
-
-
-            payment.setTransactionId(
-                    params.get(
-                            "vnp_TransactionNo"
-                    )
-            );
-
-
-
-            order.setStatus(
-                    OrderStatus.PAID
-            );
-            CartEntity cart =
-                    cartRepository
-                            .findByUserId(
-                                    order.getUser().getId()
-                            )
-                            .orElse(null);
-
-
+            }
+            CartEntity cart = cartRepository.findByUserId(order.getUser().getId()).orElse(null);
             if(cart != null){
+                Set<Long> cartItemIds =
+                        order.getItems()
+                                .stream()
+                                .map(
+                                        OrderItemEntity::getCartItemId
+                                )
+                                .collect(Collectors.toSet());
+
+
 
                 cart.getItems()
-                        .clear();
+                        .removeIf(
+                                item ->
+                                        cartItemIds.contains(
+                                                item.getId()
+                                        )
+                        );
+
+
 
                 cartRepository.save(cart);
 
             }
-
-
-
-
         }
         else{
-
-
-
             // thất bại
-
-
             payment.setPaymentStatus(
                     "FAILED"
             );
-
-
-
             order.setStatus(
                     OrderStatus.CANCELLED
             );
-
-
         }
-
-
-
-
-
-
         paymentRepository.save(payment);
-
-
         orderRepository.save(order);
-
-
-
-
         return responseCode;
-
-
     }
 
 }

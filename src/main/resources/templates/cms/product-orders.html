@@ -14,8 +14,6 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-
-
             <!-- ORDER TABLE -->
             <div class="table-container">
                 <div class="table-header">
@@ -23,6 +21,38 @@
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="Tìm kiếm đơn hàng...">
                     </div>
+                    <select id="statusFilter"
+                            class="form-control">
+
+                        <option value="">
+                            Tất cả
+                        </option>
+
+                        <option value="WAITING_PAYMENT">
+                            Chờ thanh toán
+                        </option>
+
+                        <option value="PAID">
+                            Đã thanh toán
+                        </option>
+
+                        <option value="PROCESSING">
+                            Đang xử lý
+                        </option>
+
+                        <option value="SHIPPING">
+                            Đang giao
+                        </option>
+
+                        <option value="COMPLETED">
+                            Hoàn thành
+                        </option>
+
+                        <option value="CANCELLED">
+                            Đã hủy
+                        </option>
+
+                    </select>
                 </div>
 
                 <table id="orderTable">
@@ -39,37 +69,13 @@
                         </tr>
                     </thead>
                     <tbody id="orderList">
-                        <tr>
-                            <td>#ORD001</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>0901234567</td>
-                            <td>123 Nguyễn Huệ, Q1, TP.HCM</td>
-                            <td>Áo thun tím, Quần jean</td>
-                            <td>600,000đ</td>
-                            <td>26/04/2026</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-primary btn-sm" onclick="viewOrder('#ORD001')">Xem</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#ORD002</td>
-                            <td>Trần Thị B</td>
-                            <td>0987654321</td>
-                            <td>456 Lê Lợi, Q3, TP.HCM</td>
-                            <td>Váy chữ A đỏ</td>
-                            <td>320,000đ</td>
-                            <td>25/04/2026</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-primary btn-sm" onclick="viewOrder('#ORD002')">Xem</button>
-                                </div>
-                            </td>
-                        </tr>
+
 
                     </tbody>
                 </table>
+                <div id="pagination"
+                     class="mt-3 d-flex justify-content-center">
+                </div>
             </div>
 
             <!-- MONTHLY STATS TABLE -->
@@ -90,6 +96,15 @@
                 <p><strong>Ngày đặt:</strong> <span id="orderDate"></span></p>
                 <p><strong>Tổng tiền:</strong> <span id="orderTotal"></span></p>
 
+                <p>
+                    <strong>Sản phẩm:</strong>
+                </p>
+
+                <ul id="orderItems">
+
+                </ul>
+
+
                 <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
                     <button class="btn btn-secondary" onclick="closeModal()" style="background-color: #95a5a6;">Đóng</button>
                 </div>
@@ -97,56 +112,6 @@
         </div>
     </div>
 
-    <script>
-        function viewOrder(orderCode) {
-            document.getElementById('orderCode').textContent = orderCode;
-            document.getElementById('orderCustomer').textContent = 'Nguyễn Văn A';
-            document.getElementById('orderDate').textContent = '26/04/2026';
-            document.getElementById('orderTotal').textContent = '600,000đ';
-            document.getElementById('orderModal').classList.add('show');
-        }
 
-        function closeModal() {
-            document.getElementById('orderModal').classList.remove('show');
-        }
-
-        // function updateOrderStatus() {
-        //     const status = document.getElementById('statusUpdate').value;
-        //     alert('Cập nhật trạng thái thành: ' + status);
-        //     closeModal();
-        // }
-
-        // Search and filter functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            filterOrders();
-        });
-
-
-        function filterOrders() {
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.getElementById('orderList').getElementsByTagName('tr');
-
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                const status = row.cells[7].textContent.trim();
-                const matches = text.includes(searchText) && (statusFilter === '' || status.includes(statusFilter));
-                row.style.display = matches ? '' : 'none';
-            }
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('orderModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        function logout() {
-            if (confirm('Bạn chắc chắn muốn đăng xuất?')) {
-                alert('Đã đăng xuất thành công!');
-            }
-        }
-    </script>
 </body>
 </html>

@@ -26,14 +26,34 @@
 </head>
 
 <body>
-    <!-- Topbar Start -->
-    <div th:include="guest/common/sidebar.html :: topbar-fragment"></div>
-    <!-- Topbar End -->
+<header class="topbar">
+    <div class="logo">
+        <a th:href="@{/}">Shop</a>
+    </div>
 
+    <nav class="nav">
+        <a href="/home">Trang chủ</a>
+        <a href="/user/products">Sản phẩm</a>
+        <a href="/user/promotions">Khuyến mãi</a>
+        <a href="/user/wishlist">Yêu thích</a>
+        <a href="/cart">Giỏ hàng</a>
+        <a href="/checkout">Thanh toán</a>
+    </nav>
 
-    <!-- Navbar Start -->
-    <div th:include="guest/common/navbar.html :: navbar-fragment"></div>
-    <!-- Navbar End -->
+    <div class="user-menu">
+
+        <button type="button" id="userBtn">
+            Tài khoản ▾
+        </button>
+
+        <div id="userDropdown" class="dropdown">
+            <a href="/user/account">Tài khoản</a>
+            <a href="/user/orders">Đơn mua</a>
+            <a href="/logout">Đăng xuất</a>
+        </div>
+
+    </div>
+</header>
 
 
     <!-- Page Header Start -->
@@ -178,6 +198,32 @@
 
     <!-- Template Javascript -->
     <script src="js/cart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+
+        const btn = document.getElementById("userBtn");
+        const menu = document.getElementById("userDropdown");
+
+
+        btn.addEventListener("click", function(e){
+
+            e.stopPropagation();
+
+            menu.classList.toggle("show");
+
+        });
+
+
+        document.addEventListener("click", function(){
+
+            menu.classList.remove("show");
+
+        });
+
+
+    });
+</script>
 </body>
 
 </html>

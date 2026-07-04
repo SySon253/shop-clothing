@@ -12,31 +12,13 @@ import java.util.Optional;
 // là interface được kế thừa từ JpaRespository
 
 @Repository
-public interface UserRepository
-        extends JpaRepository<UserEntity, Long> {
-
-
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("""
         SELECT u FROM UserEntity u 
         WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))
     """)
-    List<UserEntity> searchByUsername(
-            @Param("username") String username
-    );
-
-
-    Optional<UserEntity> findFirstByUsername(
-            String username
-    );
-
-
-    boolean existsByUsername(
-            String username
-    );
-
-
-    boolean existsByEmail(
-            String email
-    );
-
+    List<UserEntity> searchByUsername(@Param("username") String username);
+    Optional<UserEntity> findFirstByUsername(String username);
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

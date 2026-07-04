@@ -3,6 +3,7 @@ package vn.com.shop.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.com.shop.dto.request.UserRequestFilter;
@@ -10,8 +11,10 @@ import vn.com.shop.dto.response.ResponsePage;
 import vn.com.shop.dto.user.UserCreateDTO;
 import vn.com.shop.dto.user.UserResponseDTO;
 import vn.com.shop.dto.user.UserUpdateDTO;
+import vn.com.shop.entity.RoleEntity;
 import vn.com.shop.entity.UserEntity;
 import vn.com.shop.mapper.UserMapper;
+import vn.com.shop.repository.RoleRepository;
 import vn.com.shop.repository.UserRepository;
 import vn.com.shop.service.IUserService;
 
@@ -26,6 +29,12 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public ResponsePage<UserResponseDTO> getAllUsers(UserRequestFilter userRequestFilter, Pageable pageable) {
@@ -62,13 +71,22 @@ public class UserServiceImpl implements IUserService {
         if (userRepository.existsByEmail(userCreateDTO.getEmail())){ throw new RuntimeException("Email already exists"); }
         UserEntity user = new UserEntity();
         user.setUsername(userCreateDTO.getUsername());
-        user.setPassword(userCreateDTO.getPassword());
+//        user.setPassword(userCreateDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userCreateDTO.getPassword()));
         user.setEmail(userCreateDTO.getEmail());
         user.setFullName(userCreateDTO.getFullName());
         user.setPhone(userCreateDTO.getPhone());
         user.setCreatedBy(userCreateDTO.getCreateBy());
         user.setLastModifiedBy(userCreateDTO.getLastModifiedBy());
         user.setEnabled(true);
+        RoleEntity userRole = roleRepository.findByName("USER")
+                .orElseGet(() -> {
+                    RoleEntity role = new RoleEntity();
+                    role.setName("USER");
+                    role.setDescription("Default customer role");
+                    return roleRepository.save(role);
+                });
+        user.getRoles().add(userRole);
         userRepository.save(user);
         return null;
     }

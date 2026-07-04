@@ -6,7 +6,7 @@ const CART_API =
     "http://localhost:8080/api/carts/my-cart";
 
 
-
+let isCreatingOrder = false;
 // ================================
 // INIT
 // ================================
@@ -28,26 +28,14 @@ document.addEventListener(
 
         if(button){
 
+            console.log(
+                "FOUND PLACE ORDER BUTTON"
+            );
+
+
             button.addEventListener(
                 "click",
                 createOrder
-            );
-
-        }
-        if(button){
-
-            console.log("FOUND PLACE ORDER BUTTON");
-
-
-            button.addEventListener(
-                "click",
-                function(){
-
-                    console.log("CLICK PLACE ORDER");
-
-                    createOrder();
-
-                }
             );
 
         }
@@ -360,7 +348,20 @@ function calculateTotal(items){
 
 async function createOrder(){
 
-    console.log("CREATE ORDER RUN");
+    if(isCreatingOrder){
+
+        return;
+
+    }
+
+
+    isCreatingOrder = true;
+
+
+
+    console.log(
+        "CREATE ORDER RUN"
+    );
 
     try{
 
@@ -383,6 +384,10 @@ async function createOrder(){
             document.querySelector(
                 "#address"
             ).value;
+
+        console.log("receiverName:", receiverName);
+        console.log("phone:", phone);
+        console.log("address:", address);
 
 
 
@@ -449,27 +454,16 @@ async function createOrder(){
             await fetch(
                 ORDER_API,
                 {
-
-
                     method:"POST",
 
+                    credentials:"include",
 
                     headers:{
-
-
-                        "Content-Type":
-                            "application/json"
-
-
+                        "Content-Type":"application/json"
                     },
 
-
                     body:
-                        JSON.stringify(
-                            request
-                        )
-
-
+                        JSON.stringify(request)
                 }
             );
 
@@ -501,11 +495,6 @@ async function createOrder(){
             "ORDER:",
             data
         );
-
-
-
-
-
         if(
             payment.value === "BANKING"
         ){
@@ -519,12 +508,6 @@ async function createOrder(){
 
 
         }
-
-
-
-
-
-
         if(
             payment.value === "COD"
         ){
@@ -544,40 +527,39 @@ async function createOrder(){
 
 
             window.location.href =
-                "/order-success";
+                "/orders.html";
 
 
         }
-
-
-
-
-
     }
+    // catch(error){
+    //
+    //
+    //     console.error(
+    //         error
+    //     );
+    //
+    //
+    //     alert(
+    //         "Đặt hàng thất bại"
+    //     );
+    //
+    //
+    // }
+
     catch(error){
 
+        console.error("CREATE ORDER ERROR:", error);
 
-        console.error(
-            error
-        );
-
-
-        alert(
-            "Đặt hàng thất bại"
-        );
-
+        alert(error.message);
 
     }
+    finally{
 
+        isCreatingOrder=false;
 
+    }
 }
-
-
-
-
-
-
-
 // ================================
 // MONEY FORMAT
 // ================================
