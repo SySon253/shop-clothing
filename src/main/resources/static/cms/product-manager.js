@@ -1,7 +1,7 @@
 let editingProductId = null;
 let editingVariantId = null;
 let editingImageId = null;
-
+let currentProductId = null;
 let currentPage = 0;
 let totalPages = 0;
 const pageSize = 10;
@@ -24,7 +24,6 @@ async function loadProducts(){
         );
 
         const result = await response.json();
-
         renderProducts(result.content);
 
         totalPages = result.totalPages;
@@ -40,6 +39,301 @@ async function loadProducts(){
 
 }
 
+async function openVariantModal(productId){
+
+    currentProductId = productId;
+
+    clearVariantForm();
+
+    document
+        .getElementById("variantModal")
+        .style.display = "flex";
+
+    await loadVariants();
+
+}
+async function loadVariants(){
+
+    try{
+
+        const response =
+            await fetch(
+
+                `http://localhost:8080/api/product-variants/product/${currentProductId}`
+
+            );
+
+        if(!response.ok){
+
+            throw new Error(
+                "Không tải được danh sách Variant"
+            );
+
+        }
+
+        const variants =
+            await response.json();
+
+        renderVariants(
+            variants
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+
+}
+function closeVariantModal(){
+
+    currentProductId = null;
+
+    clearVariantForm();
+
+    document
+        .getElementById("variantModal")
+        .style.display="none";
+
+}
+function clearVariantForm(){
+
+    editingVariantId = null;
+    document
+        .getElementById("saveVariantBtn")
+        .textContent =
+        "Lưu Variant";
+
+    document.getElementById("variantSku").value = "";
+
+    document.getElementById("variantSize").value = "";
+
+    document.getElementById("variantColor").value = "";
+
+    document.getElementById("variantPrice").value = "";
+
+    document.getElementById("variantStock").value = "";
+
+}
+
+async function saveVariant(){
+
+    const isEdit =
+        editingVariantId != null;
+    try{
+        const sku =
+            document
+                .getElementById("variantSku")
+                .value
+                .trim();
+
+        const size =
+            document
+                .getElementById("variantSize")
+                .value
+                .trim();
+
+        const color =
+            document
+                .getElementById("variantColor")
+                .value
+                .trim();
+
+        const price =
+            Number(
+                document
+                    .getElementById("variantPrice")
+                    .value
+            );
+
+        const stock =
+            Number(
+                document
+                    .getElementById("variantStock")
+                    .value
+            );
+
+        if(
+            !sku ||
+            !size ||
+            !color ||
+            price <= 0 ||
+            stock < 0
+        ){
+            alert("Vui lòng nhập đầy đủ thông tin.");
+
+            return;
+
+        }
+
+        const data = {
+
+            productId: currentProductId,
+
+            sku: sku,
+
+            size: size,
+
+            color: color,
+
+            price: price,
+
+            stock: stock
+
+        };
+
+        let response;
+        if(editingVariantId == null){
+
+            response =
+                await fetch(
+
+                    "http://localhost:8080/api/product-variants",
+
+                    {
+
+                        method:"POST",
+
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+
+                        body:JSON.stringify(data)
+
+                    }
+
+                );
+
+        }
+        else{
+
+            response =
+                await fetch(
+
+                    `http://localhost:8080/api/product-variants/${editingVariantId}`,
+
+                    {
+
+                        method:"PATCH",
+
+                        headers:{
+                            "Content-Type":"application/json"
+                        },
+
+                        body:JSON.stringify(data)
+
+                    }
+
+                );
+
+        }
+
+        if(!response.ok){
+            throw new Error(
+
+                isEdit
+
+                    ? "Không thể cập nhật Variant"
+
+                    : "Không thể thêm Variant"
+
+            );
+        }
+
+        if(isEdit){
+
+            alert("Cập nhật Variant thành công");
+
+        }
+        else{
+
+            alert("Thêm Variant thành công");
+
+        }
+
+        clearVariantForm();
+
+        await loadVariants();
+
+        await loadProducts();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+
+}
+async function editVariant(id){
+
+    try{
+
+        const response =
+            await fetch(
+
+                `http://localhost:8080/api/product-variants/${id}`
+
+            );
+
+        if(!response.ok){
+
+            throw new Error(
+                "Không lấy được Variant"
+            );
+
+        }
+
+        const variant =
+            await response.json();
+
+        editingVariantId = variant.id;
+
+        document
+            .getElementById("variantSku")
+            .value =
+            variant.sku;
+
+        document
+            .getElementById("variantSize")
+            .value =
+            variant.size;
+
+        document
+            .getElementById("variantColor")
+            .value =
+            variant.color;
+
+        document
+            .getElementById("variantPrice")
+            .value =
+            variant.price;
+
+        document
+            .getElementById("variantStock")
+            .value =
+            variant.stock;
+
+        document
+            .getElementById("saveVariantBtn")
+            .textContent =
+            "Cập nhật Variant";
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+
+}
 function renderProducts(products) {
 
     const tbody =
@@ -53,38 +347,42 @@ function renderProducts(products) {
             product.images?.length > 0
                 ? product.images[0].imageUrl
                 : "";
+        const variants = product.variants || [];
 
-        const variant =
-            product.variants?.length > 0
-                ? product.variants[0]
-                : null;
+        const variantCount = variants.length;
 
-        const sku =
-            variant?.sku || "-";
+        const totalStock =
+            variants.reduce(
+                (sum, variant) => sum + variant.stock,
+                0
+            );
 
-        const price =
-            variant?.price || 0;
-
-        const stock =
-            variant?.stock || 0;
+        const minPrice =
+            variants.length > 0
+                ? Math.min(
+                    ...variants.map(
+                        variant => variant.price
+                    )
+                )
+                : 0;
         const category =
             product.category?.name || "-";
 
         let status = "";
 
-        if (stock === 0) {
+        if(totalStock === 0){
 
             status =
                 '<span class="badge badge-dark">Hết hàng</span>';
 
         }
-        else if (stock <= 10) {
+        else if(totalStock <= 10){
 
             status =
                 '<span class="badge badge-warning">Sắp hết</span>';
 
         }
-        else {
+        else{
 
             status =
                 '<span class="badge badge-success">Còn hàng</span>';
@@ -112,13 +410,13 @@ function renderProducts(products) {
 
                 <td>${product.name}</td>
 
-                <td>${sku}</td>
-
                 <td>${category}</td>
 
-                <td>${price.toLocaleString()}đ</td>
-
-                <td>${stock}</td>
+                <td>${minPrice.toLocaleString()}đ</td>
+                
+                <td>${totalStock}</td>
+                
+                <td>${variantCount}</td>
 
                 <td>${status}</td>
 
@@ -129,7 +427,15 @@ function renderProducts(products) {
                         onclick="editProduct(${product.id})">
                         Sửa
                         </button>
+                        <button
+
+                        class="btn btn-info"
                         
+                        onclick="openVariantModal(${product.id})">
+                        
+                        Variant
+                        
+                        </button>
                         <button 
                         class="btn btn-danger btn-sm"
                         onclick="deleteProduct(${product.id})">
@@ -152,9 +458,6 @@ document.addEventListener(
         loadProducts();
     }
 );
-
-
-
 async function loadCategories() {
 
     try {
@@ -200,9 +503,6 @@ async function loadCategories() {
 function createSlug(text){
     return text.toLowerCase().trim().replace(/\s+/g,"-");
 }
-
-
-
 async function saveProduct(event){
     event.preventDefault();
     try{
@@ -211,14 +511,6 @@ async function saveProduct(event){
         const productName1 =
             document.getElementById("productName").value.trim();
 
-        const sku =
-            document.getElementById("productSKU").value.trim();
-
-        const price =
-            Number(document.getElementById("productPrice").value);
-
-        const stock =
-            Number(document.getElementById("productStock").value);
 
         const category =
             document.getElementById("productCategory").value;
@@ -234,12 +526,6 @@ async function saveProduct(event){
             return;
         }
 
-        if(sku === ""){
-
-            alert("SKU không được để trống.");
-
-            return;
-        }
 
         if(category === ""){
 
@@ -248,19 +534,6 @@ async function saveProduct(event){
             return;
         }
 
-        if(price <= 0){
-
-            alert("Giá phải lớn hơn 0.");
-
-            return;
-        }
-
-        if(stock < 0){
-
-            alert("Tồn kho không được nhỏ hơn 0.");
-
-            return;
-        }
         const productData = {
             name: document.getElementById("productName").value,
             slug: createSlug(productName),
@@ -270,6 +543,8 @@ async function saveProduct(event){
             createBy: "admin",
             lastModifiedBy: "admin"
         };
+        let url;
+        let method;
         if(editingProductId){
 
             url =
@@ -306,57 +581,6 @@ async function saveProduct(event){
         const productId = product.id;
         if (!productId) {
             throw new Error("Không lấy được productId");
-        }
-
-        const variantData = {
-            productId: productId,
-            sku: document.getElementById("productSKU").value,
-            price: Number(document.getElementById("productPrice").value),
-            discountPrice: 0,
-            stock: Number(document.getElementById("productStock").value),
-            reservedStock: 0,
-            size: document.getElementById("productSize").value,
-            color: document.getElementById("productColor").value
-        };
-        console.log("variantData =", variantData);
-
-        let variantResponse;
-
-
-        if(editingVariantId){
-
-            variantResponse = await fetch(
-                `http://localhost:8080/api/product-variants/${editingVariantId}`,
-                {
-                    method:"PATCH",
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
-                    body:JSON.stringify(variantData)
-                }
-            );
-
-        }
-        else{
-
-            variantResponse = await fetch(
-                "http://localhost:8080/api/product-variants",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
-                    body:JSON.stringify(variantData)
-                }
-            );
-
-        }
-        if (!variantResponse.ok) {
-
-            const error = await variantResponse.json();
-
-            throw new Error(error.message);
-
         }
         const imageUrl =
             document.getElementById("productImage").value;
@@ -489,38 +713,6 @@ async function editProduct(id){
 
         document.getElementById("productCategory").value =
             product.category.id;
-
-
-
-        // lấy variant đầu tiên
-
-        if(product.variants && product.variants.length > 0){
-
-            const variant = product.variants[0];
-
-            editingVariantId = variant.id;
-
-
-            document.getElementById("productSKU").value =
-                variant.sku || "";
-
-
-            document.getElementById("productPrice").value =
-                variant.price || 0;
-
-
-            document.getElementById("productStock").value =
-                variant.stock || 0;
-
-
-            document.getElementById("productSize").value =
-                variant.size || "";
-
-
-            document.getElementById("productColor").value =
-                variant.color || "";
-        }
-
         if(product.images && product.images.length > 0){
 
             const image = product.images[0];
@@ -550,15 +742,33 @@ async function editProduct(id){
     }
 
 }
-function openModal(){
+
+function openModal() {
+
+    editingProductId = null;
+    editingImageId = null;
+
+    document.getElementById("productForm").reset();
+
+    document.getElementById("modalTitle").textContent =
+        "Thêm sản phẩm";
+
     document.getElementById("productModal").style.display = "flex";
 }
 function closeModal(){
-    document.getElementById("productModal").style.display = "none";
+
+    document
+        .getElementById("productModal")
+        .style.display="none";
+
+    document
+        .getElementById("productForm")
+        .reset();
 
     editingProductId = null;
-    editingVariantId = null;
+
     editingImageId = null;
+
 }
 
 
@@ -586,30 +796,6 @@ async function deleteProduct(id){
     }
 }
 
-function renderPagination(){
-
-    const pagination =
-        document.getElementById("pagination");
-
-    pagination.innerHTML = "";
-
-    for(let i = 0; i < totalPages; i++){
-
-        pagination.innerHTML +=
-
-            `
-                <button
-                    class="${i===currentPage ? 'active-page':''}"
-                    onclick="goToPage(${i})">
-
-                    ${i+1}
-
-                </button>
-            `;
-
-    }
-
-}
 function goToPage(page){
 
     currentPage = page;
@@ -697,6 +883,140 @@ function nextPage(){
         currentPage++;
 
         loadProducts();
+
+    }
+
+}
+
+function renderVariants(variants){
+
+    const tbody =
+        document.getElementById("variantList");
+
+    tbody.innerHTML = "";
+
+    if(variants.length === 0){
+
+        tbody.innerHTML =
+
+            `
+            <tr>
+
+                <td colspan="6"
+                    style="text-align:center">
+
+                    Chưa có Variant
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+    variants.forEach(
+
+        variant=>{
+
+            tbody.innerHTML +=
+
+                `
+                <tr>
+
+                    <td>${variant.sku}</td>
+
+                    <td>${variant.size}</td>
+
+                    <td>${variant.color}</td>
+
+                    <td>${variant.price.toLocaleString()} đ</td>
+
+                    <td>${variant.stock}</td>
+
+                    <td>
+
+                        <button
+                            class="btn btn-warning"
+                            onclick="editVariant(${variant.id})">
+
+                            Sửa
+
+                        </button>
+
+                        <button
+                            class="btn btn-danger"
+                            onclick="deleteVariant(${variant.id})">
+
+                            Xóa
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    );
+
+}
+async function deleteVariant(id){
+
+    const confirmDelete =
+        confirm(
+            "Bạn có chắc chắn muốn xóa Variant này?"
+        );
+
+    if(!confirmDelete){
+
+        return;
+
+    }
+
+    try{
+
+        const response =
+            await fetch(
+
+                `http://localhost:8080/api/product-variants/${id}`,
+
+                {
+
+                    method:"DELETE"
+
+                }
+
+            );
+
+        if(!response.ok){
+
+            throw new Error(
+                "Không thể xóa Variant."
+            );
+
+        }
+
+        alert(
+            "Xóa Variant thành công."
+        );
+
+        clearVariantForm();
+
+        await loadVariants();
+
+        await loadProducts();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(error.message);
 
     }
 

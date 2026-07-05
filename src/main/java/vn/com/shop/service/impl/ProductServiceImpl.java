@@ -74,7 +74,16 @@ public class ProductServiceImpl implements IProductService {
         ProductEntity productEntity = new ProductEntity();
         productEntity.setName(request.getName());
         productEntity.setDescription(request.getDescription());
-        productEntity.setSlug(request.getSlug());
+//        productEntity.setSlug(request.getSlug());
+        String slug = request.getName()
+                .trim()
+                .toLowerCase()
+                .replace(" ", "-");
+        if(productRepository.existsBySlug(slug)){
+            throw new RuntimeException("Slug đã tồn tại.");
+        }
+
+        productEntity.setSlug(slug);
         productEntity.setDescription(request.getDescription());
         productEntity.setBrand(request.getBrand());
         productEntity.setCreatedBy(request.getCreateBy());
@@ -91,7 +100,17 @@ public class ProductServiceImpl implements IProductService {
         if (request.getDescription() != null) {productEntity.setDescription(request.getDescription());}
         if (request.getActive() != null) {productEntity.setActive(request.getActive());}
         if (request.getBrand() != null) {productEntity.setBrand(request.getBrand());}
+        if(request.getCategoryId() != null){
 
+            CategoryEntity category =
+                    categoryRepository.findById(request.getCategoryId())
+                            .orElseThrow(
+                                    () -> new RuntimeException("Category not found")
+                            );
+
+            productEntity.setCategory(category);
+
+        }
         productEntity = productRepository.save(productEntity);
         return productMapper.entityToDto(productEntity);
     }
@@ -139,6 +158,7 @@ public void deleteProduct(Long id) {
                         new RuntimeException("Không tìm thấy sản phẩm")
                 );
 
+        System.out.println("Images = " + product.getImages().size());
         return productMapper.entityToDto(product);
     }
 }

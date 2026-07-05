@@ -3,9 +3,13 @@ package vn.com.shop.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import vn.com.shop.dto.product.ProductImageResponseDTO;
 import vn.com.shop.dto.product.ProductResponseDTO;
+import vn.com.shop.dto.product.ProductVariantResponseDTO;
 import vn.com.shop.entity.CategoryEntity;
 import vn.com.shop.entity.ProductEntity;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -34,8 +38,23 @@ public class ProductMapper {
         productResponseDTO.setBrand(productEntity.getBrand());
         productResponseDTO.setActive(productEntity.getActive());
         productResponseDTO.setCategory(categoryMapper.entityToDto(productEntity.getCategory()));
-        productResponseDTO.setImages(productImageMapper.entityToDto(productEntity.getImages()));
-        productResponseDTO.setVariants(productVariantMapper.entityToDto(productEntity.getVariants()));
+        System.out.println("Entity images = " + productEntity.getImages().size());
+        List<ProductImageResponseDTO> images =
+                productEntity.getImages()
+                        .stream()
+                        .filter(image -> !image.getDeleted())
+                        .map(productImageMapper::entityToDto)
+                        .toList();
+        System.out.println("DTO images = " + images.size());
+        productResponseDTO.setImages(images);
+        List<ProductVariantResponseDTO> variants =
+                productEntity.getVariants()
+                        .stream()
+                        .filter(variant -> !variant.getDeleted())
+                        .map(productVariantMapper::entityToDto)
+                        .toList();
+
+        productResponseDTO.setVariants(variants);
         return productResponseDTO;
     }
     public ProductEntity dtoToEntity(ProductResponseDTO productResponseDTO){

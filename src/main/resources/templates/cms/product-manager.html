@@ -23,22 +23,22 @@
                     <h3>Danh sách sản phẩm</h3>
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
-                        <button class="btn btn-primary" onclick="openAddModal()">+ Thêm mới</button>
+                        <button class="btn btn-primary" onclick="openModal()">+ Thêm mới</button>
                     </div>
                 </div>
 
                 <table id="productTable">
                     <thead>
-                        <tr>
-                            <th>Hình ảnh</th>
-                            <th>Tên sản phẩm</th>
-                            <th>SKU</th>
-                            <th>Danh mục</th>
-                            <th>Giá</th>
-                            <th>Tồn kho</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
-                        </tr>
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th>Giá từ</th>
+                        <th>Tổng tồn</th>
+                        <th>Số Variant</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
                     </thead>
                     <tbody id="productList">
 
@@ -76,7 +76,7 @@
                     </select>
                 </div>
 
-                <div class="form-row">
+                <!-- <div class="form-row">
                     <div class="form-group">
                         <label>Size</label>
                         <input type="text" id="productSize">
@@ -98,13 +98,13 @@
                         <label>Giá</label>
                         <input type="number" id="productPrice" min="1" required>
                     </div>
-                </div>
+                </div>-->
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <!--<div class="form-group">
                         <label>Tồn kho</label>
                         <input type="number" id="productStock" min="0" required>
-                    </div>
+                    </div>-->
 
                     <div class="form-group">
                         <label>Hình ảnh URL</label>
@@ -132,49 +132,134 @@
         </div>
     </div>
 
+    <!-- MODAL VARIANT -->
+    <div id="variantModal" class="modal">
 
-    <script>
-        let isEditMode = false;
-        let editingId = null;
+        <div class="modal-content" style="width:900px;">
 
-        function openAddModal() {
-            isEditMode = false;
-            editingId = null;
-            document.getElementById('modalTitle').textContent = 'Thêm sản phẩm mới';
-            document.getElementById('productForm').reset();
-            document.getElementById('productModal').classList.add('show');
-        }
+            <div class="modal-header">
 
-        function closeModal() {
-            document.getElementById('productModal').classList.remove('show');
-            document.getElementById('productForm').reset();
-        }
+                <h2 id="variantTitle">
 
+                    Quản lý Variant
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase();
-            const rows = document.getElementById('productList').getElementsByTagName('tr');
+                </h2>
 
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchText) ? '' : 'none';
-            }
-        });
+                <button
+                        class="close-btn"
+                        onclick="closeVariantModal()">
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('productModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
+                    &times;
 
-        function logout() {
-            if (confirm('Bạn chắc chắn muốn đăng xuất?')) {
-                alert('Đã đăng xuất thành công!');
-            }
-        }
-    </script>
+                </button>
+
+            </div>
+
+            <div style="margin-bottom:20px;">
+
+                <button
+                        class="btn btn-success"
+                        onclick="openAddVariantForm()">
+
+                    + Thêm Variant
+
+                </button>
+
+            </div>
+
+            <div id="variantFormContainer" style="margin-bottom:20px;">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>SKU</label>
+                        <input type="text" id="variantSku">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Size</label>
+                        <select id="variantSize">
+
+                            <option value="S">S</option>
+
+                            <option value="M">M</option>
+
+                            <option value="L">L</option>
+
+                            <option value="XL">XL</option>
+
+                            <option value="XXL">XXL</option>
+
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Màu</label>
+                        <input type="text" id="variantColor">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Giá</label>
+                        <input type="number" id="variantPrice">
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Tồn kho</label>
+                        <input type="number" id="variantStock">
+                    </div>
+
+                </div>
+
+                <button
+                        id="saveVariantBtn"
+                        class="btn btn-success"
+                        onclick="saveVariant()">
+
+                    Lưu Variant
+
+                </button>
+
+            </div>
+
+            <table class="table">
+
+                <thead>
+
+                <tr>
+
+                    <th>SKU</th>
+
+                    <th>Size</th>
+
+                    <th>Màu</th>
+
+                    <th>Giá</th>
+
+                    <th>Tồn kho</th>
+
+                    <th>Hành động</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="variantList">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </body>
 </html>

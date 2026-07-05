@@ -65,12 +65,27 @@ function renderProducts(products) {
 
 
 
+        // let price = 0;
+        // let discountPrice = 0;
+        //
+        // if (product.variants && product.variants.length > 0) {
+        //     price = product.variants[0].price;
+        //     discountPrice = product.variants[0].discountPrice;
+        // }
         let price = 0;
         let discountPrice = 0;
+        let variantId = null;
 
         if (product.variants && product.variants.length > 0) {
-            price = product.variants[0].price;
-            discountPrice = product.variants[0].discountPrice;
+
+            const variant = product.variants[0];
+
+            variantId = variant.id;
+
+            price = variant.price ?? 0;
+
+            discountPrice = variant.discountPrice ?? price;
+
         }
 
 
@@ -144,13 +159,26 @@ function renderProducts(products) {
 
 
                         <div class="d-flex justify-content-center">
-                            <h6>
+                            <!--<h6>
                                 ${discountPrice.toLocaleString()} VNĐ
                             </h6>
                         
                             <h6 class="text-muted ml-2">
                                 <del>${price.toLocaleString()} VNĐ</del>
+                            </h6>--> 
+                            <h6>
+                                ${discountPrice.toLocaleString()} VNĐ
                             </h6>
+                            
+                            ${
+                                        discountPrice < price
+                                            ? `
+                                    <h6 class="text-muted ml-2">
+                                        <del>${price.toLocaleString()} VNĐ</del>
+                                    </h6>
+                                  `
+                                            : ""
+                                    }
                         </div>
 
 
@@ -182,7 +210,7 @@ function renderProducts(products) {
 
 
 
-                        <a 
+                        <!--<a 
                             href="#"
                             onclick="addToCart(${product.variants[0].id})"
                             class="btn btn-sm text-dark p-0"
@@ -192,7 +220,19 @@ function renderProducts(products) {
 
                             Add To Cart
 
-                        </a>
+                        </a>-->
+                        ${
+                            variantId
+                                ? `<a href="#"
+                              onclick="addToCart(${variantId})"
+                              class="btn btn-sm text-dark p-0">
+                                <i class="fas fa-shopping-cart text-primary mr-1"></i>
+                                Add To Cart
+                           </a>`
+                                : `<span class="btn btn-sm text-muted p-0">
+                                Hết hàng
+                           </span>`
+                        }
 
 
                     </div>

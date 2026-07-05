@@ -22,7 +22,10 @@ public class CartItemMapper {
         cartItemResponseDTO.setSize(productVariantEntity.getSize());
         cartItemResponseDTO.setColor(productVariantEntity.getColor());
 
-        BigDecimal price = productVariantEntity.getPrice() != null ? productVariantEntity.getDiscountPrice() : productVariantEntity.getPrice();
+        BigDecimal price =
+                productVariantEntity.getDiscountPrice() != null
+                        ? productVariantEntity.getDiscountPrice()
+                        : productVariantEntity.getPrice();
 
         cartItemResponseDTO.setPrice(price);
         cartItemResponseDTO.setQuantity(cartItemEntity.getQuantity());

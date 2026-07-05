@@ -13,4 +13,5 @@ public class ProductUpdateDTO {
     @NotBlank(message = "Thương hiệu không được để trống")
     private String brand;
     private Boolean active;
+    private Long categoryId;
 }

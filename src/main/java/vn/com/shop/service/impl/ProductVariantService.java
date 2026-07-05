@@ -3,7 +3,6 @@ package vn.com.shop.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.com.shop.dto.product.ProductVariantCreateDTO;
 import vn.com.shop.dto.product.ProductVariantRequestDTO;
 import vn.com.shop.dto.product.ProductVariantResponseDTO;
 import vn.com.shop.entity.ProductEntity;
@@ -34,6 +33,13 @@ public class ProductVariantService implements IProductVariantService {
                         .orElseThrow(
                                 () -> new RuntimeException(
                                         "Product not found"));
+        if(productVariantRepository
+                .findBySkuAndDeletedFalse(requestDTO.getSku())
+                .isPresent()){
+
+            throw new RuntimeException("SKU đã tồn tại");
+
+        }
         ProductVariantEntity variant = new ProductVariantEntity();
 
         variant.setProduct(product);
@@ -56,7 +62,7 @@ public class ProductVariantService implements IProductVariantService {
             Long id) {
 
         ProductVariantEntity variant =
-                productVariantRepository.findById(id)
+                productVariantRepository.findByIdAndDeletedFalse(id)
                         .orElseThrow(
                                 () -> new RuntimeException(
                                         "Variant not found"));
@@ -70,7 +76,7 @@ public class ProductVariantService implements IProductVariantService {
     getVariantsByProduct(Long productId) {
 
         return productVariantRepository
-                .findByProductId(productId)
+                .findByProductIdAndDeletedFalse(productId)
                 .stream()
                 .map(productVariantMapper::entityToDto)
                 .toList();
@@ -82,7 +88,7 @@ public class ProductVariantService implements IProductVariantService {
             ProductVariantRequestDTO requestDTO) {
 
         ProductVariantEntity variant =
-                productVariantRepository.findById(id)
+                productVariantRepository.findByIdAndDeletedFalse(id)
                         .orElseThrow(
                                 () -> new RuntimeException(
                                         "Variant not found"));
@@ -123,7 +129,7 @@ public class ProductVariantService implements IProductVariantService {
 
         ProductVariantEntity variant =
                 productVariantRepository
-                        .findById(variantId)
+                        .findByIdAndDeletedFalse(variantId)
                         .orElseThrow(
                                 () -> new RuntimeException(
                                         "Variant không tồn tại")

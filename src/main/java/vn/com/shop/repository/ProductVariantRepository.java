@@ -9,6 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariantEntity, Long> {
-    Optional<ProductVariantEntity> findBySku(String sku);
-    List<ProductVariantEntity> findByProductId(Long productId);
+    Optional<ProductVariantEntity>
+    findBySkuAndDeletedFalse(String sku);
+    List<ProductVariantEntity>
+    findByProductIdAndDeletedFalse(Long productId);
+    Optional<ProductVariantEntity>
+    findByIdAndDeletedFalse(Long id);
 }

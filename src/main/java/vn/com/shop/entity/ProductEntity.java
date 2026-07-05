@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,9 +26,9 @@ public class ProductEntity extends BaseEntity {
     private CategoryEntity category;
 
     @OneToMany(mappedBy = "product")
-    private Set<ProductImageEntity> images;
+    private Set<ProductImageEntity> images = new HashSet<>();
 
     @OrderBy("id ASC")
     @OneToMany(mappedBy = "product")
-    private Set<ProductVariantEntity> variants;
+    private Set<ProductVariantEntity> variants = new HashSet<>();
 }

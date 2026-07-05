@@ -38,6 +38,6 @@ public class ProductVariantController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductVariantResponseDTO> deleteVariant(@PathVariable Long id){
         productVariantService.deleteVariant(id);
-        return ResponseEntity.ok(productVariantService.getVariantById(id));
+        return ResponseEntity.noContent().build();
     }
 }
