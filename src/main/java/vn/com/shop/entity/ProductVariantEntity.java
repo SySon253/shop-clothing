@@ -16,8 +16,17 @@ public class ProductVariantEntity extends BaseEntity{
     private String sku;
     private BigDecimal price;
     private BigDecimal discountPrice;
-    private Integer stock;
-    private Integer reservedStock;
+    @Column(nullable = false)
+    private Integer stock = 0;          // On Hand
+
+    @Column(nullable = false)
+    private Integer reservedStock = 0;  // Reserved
+
+    @Column(nullable = false)
+    private Integer sold = 0;           // Lifetime Sold
+
+    @Column(nullable = false)
+    private Integer reorderLevel = 20;
     private String size;
     private String color;
     @ManyToOne

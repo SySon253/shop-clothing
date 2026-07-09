@@ -5,449 +5,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tồn kho - Admin Shop</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <!-- SIDEBAR -->
-        <div th:include="cms/common/sidebar.html :: sidebar-fragment"></div>
+<div class="admin-container">
+    <div th:include="cms/common/sidebar.html :: sidebar-fragment"></div>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <!-- HEADER -->
-            <div th:replace="cms/common/header.html :: header('Quản lý tồn kho')"></div>
+    <main class="main-content">
+        <div th:replace="cms/common/header.html :: header('Quản lý tồn kho')"></div>
 
-            <!-- INVENTORY STATS -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📦</div>
-                    <div class="stat-label">Tổng sản phẩm</div>
-                    <div class="stat-value">245</div>
-                    <div class="stat-change">Tổng số loại hàng</div>
+        <div class="row mb-4">
+            <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+                <div class="inventory-card">
+                    <h6>Total Variants</h6>
+                    <h2 id="totalVariants">0</h2>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-label">Tổng số lượng</div>
-                    <div class="stat-value">3,450</div>
-                    <div class="stat-change">Chiếc quần áo</div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+                <div class="inventory-card">
+                    <h6>Inventory Value</h6>
+                    <h2 id="inventoryValue">0 VNĐ</h2>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">⚠️</div>
-                    <div class="stat-label">Tồn kho thấp</div>
-                    <div class="stat-value">12</div>
-                    <div class="stat-change">Cần nhập hàng</div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+                <div class="inventory-card warning">
+                    <h6>Low Stock</h6>
+                    <h2 id="lowStock">0</h2>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">🚀</div>
-                    <div class="stat-label">Sản phẩm bán chạy</div>
-                    <div class="stat-value">28</div>
-                    <div class="stat-change">Tháng này</div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+                <div class="inventory-card danger">
+                    <h6>Out Of Stock</h6>
+                    <h2 id="outOfStock">0</h2>
                 </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">❄️</div>
-                    <div class="stat-label">Tồn kho chậm</div>
-                    <div class="stat-value">15</div>
-                    <div class="stat-change">Bán chậm</div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+                <div class="inventory-card success">
+                    <h6>Total Sold</h6>
+                    <h2 id="totalSold">0</h2>
                 </div>
+            </div>
+        </div>
 
-                <div class="stat-card">
-                    <div class="stat-icon">💵</div>
-                    <div class="stat-label">Giá trị tồn kho</div>
-                    <div class="stat-value">456.8M</div>
-                    <div class="stat-change">Tổng giá trị</div>
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Chi tiết tồn kho</h3>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
                 </div>
             </div>
 
-            <!-- CHARTS -->
-<!--            <div class="chart-container">-->
-<!--                <h3>📈 Tồn kho theo danh mục</h3>-->
-<!--                <div class="chart-placeholder">-->
-<!--                    Biểu đồ tồn kho theo danh mục (Dữ liệu mẫu)-->
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Variant</th>
+                    <th>On Hand</th>
+                    <th>Reserved</th>
+                    <th>Available</th>
+                    <th>Lifetime Sold</th>
+                    <th>Inventory Value</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="variantTableBody"></tbody>
+            </table>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+
+                <div id="pageInfo"></div>
+
+                <div id="pagination"></div>
+
+            </div>
+        </div>
+
+<!--        <div class="modal fade" id="historyModal">-->
+<!--            <div class="modal-dialog modal-xl">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header">-->
+<!--                        <h5 class="modal-title">Inventory History</h5>-->
+<!--                        <button class="close" data-dismiss="modal">&times;</button>-->
+<!--                    </div>-->
+<!--                    <div class="modal-body">-->
+<!--                        <table class="table">-->
+<!--                            <thead>-->
+<!--                            <tr>-->
+<!--                                <th>Time</th>-->
+<!--                                <th>Type</th>-->
+<!--                                <th>Before</th>-->
+<!--                                <th>Change</th>-->
+<!--                                <th>After</th>-->
+<!--                                <th>Reference</th>-->
+<!--                                <th>Reason</th>-->
+<!--                            </tr>-->
+<!--                            </thead>-->
+<!--                            <tbody id="historyTableBody"></tbody>-->
+<!--                        </table>-->
+<!--                    </div>-->
 <!--                </div>-->
 <!--            </div>-->
-
-<!--            <div class="chart-container">-->
-<!--                <h3>📊 Tỉ lệ quay vòng tồn kho</h3>-->
-<!--                <div class="chart-placeholder">-->
-<!--                    Biểu đồ tỉ lệ quay vòng (Dữ liệu mẫu)-->
-<!--                </div>-->
-<!--            </div>-->
-
-            <!-- INVENTORY TABLE -->
-            <div class="table-container">
-                <div class="table-header">
-                    <h3>Chi tiết tồn kho</h3>
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm...">
-                        <button class="btn btn-primary" onclick="exportInventory()">📥 Xuất Excel</button>
+<!--        </div>-->
+        <div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered"> <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title font-weight-bold text-secondary">
+                        <i class="fas fa-history mr-2"></i> Inventory History
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle mb-0">
+                            <thead class="thead-light">
+                            <tr>
+                                <th class="border-top-0 pl-4">Time</th>
+                                <th class="border-top-0">Type</th>
+                                <th class="border-top-0 text-right">Before</th>
+                                <th class="border-top-0 text-center">Change</th>
+                                <th class="border-top-0 text-right">After</th>
+                                <th class="border-top-0">Reference</th>
+                                <th class="border-top-0 pr-4">Reason</th>
+                            </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <table id="inventoryTable">
-                    <thead>
-                        <tr>
-                            <th>Sản phẩm</th>
-                            <th>SKU</th>
-                            <th>Danh mục</th>
-                            <th>Tồn kho</th>
-                            <th>Mức tối thiểu</th>
-                            <th>Trạng thái</th>
-                            <th>Giá/Chiếc</th>
-                            <th>Giá trị tồn kho</th>
-                            <th>Nhập cuối</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryList">
-                        <tr>
-                            <td>Áo thun tím</td>
-                            <td>SKU001</td>
-                            <td>Áo phông</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #e8f5e9; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 85%; height: 100%; background-color: #27ae60;"></div>
-                                    </div>
-                                    <span>85</span>
-                                </div>
-                            </td>
-                            <td>20</td>
-                            <td><span class="stock-status high"><span class="stock-dot high"></span>Cao</span></td>
-                            <td>150,000đ</td>
-                            <td>12.75M</td>
-                            <td>15/04/2026</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="updateStock('Áo thun tím')">Cập nhật</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Quần jean xanh</td>
-                            <td>SKU002</td>
-                            <td>Quần</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #fff3e0; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 60%; height: 100%; background-color: #f39c12;"></div>
-                                    </div>
-                                    <span>60</span>
-                                </div>
-                            </td>
-                            <td>20</td>
-                            <td><span class="stock-status medium"><span class="stock-dot medium"></span>Vừa phải</span></td>
-                            <td>450,000đ</td>
-                            <td>27M</td>
-                            <td>10/04/2026</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="updateStock('Quần jean xanh')">Cập nhật</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Áo sơ mi trắng</td>
-                            <td>SKU003</td>
-                            <td>Áo sơ mi</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #e8f5e9; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 90%; height: 100%; background-color: #27ae60;"></div>
-                                    </div>
-                                    <span>90</span>
-                                </div>
-                            </td>
-                            <td>25</td>
-                            <td><span class="stock-status high"><span class="stock-dot high"></span>Cao</span></td>
-                            <td>200,000đ</td>
-                            <td>18M</td>
-                            <td>12/04/2026</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="updateStock('Áo sơ mi trắng')">Cập nhật</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Váy chữ A đỏ</td>
-                            <td>SKU004</td>
-                            <td>Váy</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #f8d7da; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 25%; height: 100%; background-color: #e74c3c;"></div>
-                                    </div>
-                                    <span>5</span>
-                                </div>
-                            </td>
-                            <td>15</td>
-                            <td><span class="stock-status low"><span class="stock-dot low"></span>Sắp hết</span></td>
-                            <td>320,000đ</td>
-                            <td>1.6M</td>
-                            <td>20/03/2026</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="updateStock('Váy chữ A đỏ')">Nhập gấp</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Áo khoác gió</td>
-                            <td>SKU005</td>
-                            <td>Áo khoác</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #e8f5e9; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 72%; height: 100%; background-color: #27ae60;"></div>
-                                    </div>
-                                    <span>72</span>
-                                </div>
-                            </td>
-                            <td>20</td>
-                            <td><span class="stock-status high"><span class="stock-dot high"></span>Cao</span></td>
-                            <td>380,000đ</td>
-                            <td>27.36M</td>
-                            <td>18/04/2026</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="updateStock('Áo khoác gió')">Cập nhật</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Áo thun đen</td>
-                            <td>SKU006</td>
-                            <td>Áo phông</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #f8d7da; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 33%; height: 100%; background-color: #e74c3c;"></div>
-                                    </div>
-                                    <span>8</span>
-                                </div>
-                            </td>
-                            <td>20</td>
-                            <td><span class="stock-status low"><span class="stock-dot low"></span>Sắp hết</span></td>
-                            <td>150,000đ</td>
-                            <td>1.2M</td>
-                            <td>22/03/2026</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="updateStock('Áo thun đen')">Nhập gấp</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Quần short nữ</td>
-                            <td>SKU007</td>
-                            <td>Quần</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #f8d7da; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 30%; height: 100%; background-color: #e74c3c;"></div>
-                                    </div>
-                                    <span>6</span>
-                                </div>
-                            </td>
-                            <td>15</td>
-                            <td><span class="stock-status low"><span class="stock-dot low"></span>Sắp hết</span></td>
-                            <td>200,000đ</td>
-                            <td>1.2M</td>
-                            <td>19/03/2026</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="updateStock('Quần short nữ')">Nhập gấp</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Áo sơ mi xanh</td>
-                            <td>SKU008</td>
-                            <td>Áo sơ mi</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <div style="width: 100%; background-color: #e8f5e9; height: 24px; border-radius: 12px; overflow: hidden;">
-                                        <div style="width: 78%; height: 100%; background-color: #27ae60;"></div>
-                                    </div>
-                                    <span>78</span>
-                                </div>
-                            </td>
-                            <td>25</td>
-                            <td><span class="stock-status high"><span class="stock-dot high"></span>Cao</span></td>
-                            <td>200,000đ</td>
-                            <td>15.6M</td>
-                            <td>14/04/2026</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="updateStock('Áo sơ mi xanh')">Cập nhật</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- CATEGORY INVENTORY SUMMARY -->
-            <div class="table-container">
-                <div class="table-header">
-                    <h3>Tóm tắt tồn kho theo danh mục</h3>
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
                 </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Danh mục</th>
-                            <th>Số loại sản phẩm</th>
-                            <th>Tổng tồn kho</th>
-                            <th>Tồn kho thấp</th>
-                            <th>Giá trị tồn kho</th>
-                            <th>% so với tổng</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Áo phông</td>
-                            <td>25</td>
-                            <td>450</td>
-                            <td>2</td>
-                            <td>67.5M</td>
-                            <td>14.8%</td>
-                        </tr>
-                        <tr>
-                            <td>Áo sơ mi</td>
-                            <td>35</td>
-                            <td>680</td>
-                            <td>1</td>
-                            <td>136M</td>
-                            <td>29.7%</td>
-                        </tr>
-                        <tr>
-                            <td>Quần</td>
-                            <td>40</td>
-                            <td>520</td>
-                            <td>2</td>
-                            <td>195M</td>
-                            <td>42.7%</td>
-                        </tr>
-                        <tr>
-                            <td>Váy</td>
-                            <td>28</td>
-                            <td>420</td>
-                            <td>3</td>
-                            <td>105M</td>
-                            <td>23%</td>
-                        </tr>
-                        <tr>
-                            <td>Áo khoác</td>
-                            <td>32</td>
-                            <td>380</td>
-                            <td>2</td>
-                            <td>152.8M</td>
-                            <td>33.4%</td>
-                        </tr>
-                        <tr style="background-color: #f0f0f0; font-weight: bold;">
-                            <td>TỔNG CỘNG</td>
-                            <td>160</td>
-                            <td>2,450</td>
-                            <td>10</td>
-                            <td>656.3M</td>
-                            <td>100%</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
-        </main>
-    </div>
+            </div>
+        </div>
+    </main>
+</div>
 
-    <!-- UPDATE INVENTORY MODAL -->
-    <div id="inventoryModal" class="modal">
+<div class="modal fade" id="adjustModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Cập nhật tồn kho</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <h5 class="modal-title">Adjust Inventory</h5>
+                <button class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form onsubmit="saveInventory(event)">
+            <div class="modal-body">
+                <input type="hidden" id="variantId">
                 <div class="form-group">
-                    <label>Tên sản phẩm</label>
-                    <input type="text" id="inventoryProduct" readonly>
+                    <label>Current Stock</label>
+                    <input id="currentStock" class="form-control" readonly>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Tồn kho hiện tại</label>
-                        <input type="number" id="currentStock" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Số lượng nhập (+/-)</label>
-                        <input type="number" id="quantityChange" placeholder="0" required>
-                    </div>
-                </div>
-
                 <div class="form-group">
-                    <label>Lý do</label>
-                    <select id="reason" required>
-                        <option value="">Chọn lý do</option>
-                        <option value="Nhập hàng mới">Nhập hàng mới</option>
-                        <option value="Xuất bán">Xuất bán</option>
-                        <option value="Hàng lỗi/Trả lại">Hàng lỗi/Trả lại</option>
-                        <option value="Kiểm kho">Kiểm kho</option>
-                        <option value="Khác">Khác</option>
+                    <label>Movement Type</label>
+                    <select id="movementType" class="form-control">
+                        <option value="IMPORT">Import</option>
+                        <option value="RETURN">Return</option>
+                        <option value="DAMAGED">Damaged</option>
+                        <option value="LOST">Lost</option>
+                        <option value="ADJUSTMENT">Manual Adjustment</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label>Ghi chú</label>
-                    <textarea id="notes" placeholder="Nhập ghi chú..."></textarea>
+                    <label>Quantity</label>
+                    <input id="quantity" type="number" class="form-control">
                 </div>
-
-                <div class="form-buttons">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()" style="background-color: #95a5a6;">Hủy</button>
-                    <button type="submit" class="btn btn-success">Cập nhật</button>
+                <div class="form-group">
+                    <label>Reference</label>
+                    <input id="reference" class="form-control" placeholder="PO-001">
                 </div>
-            </form>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <textarea id="reason" class="form-control"></textarea>
+                </div>
+                <hr>
+                <h5>Result Stock : <span id="resultStock"></span></h5>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="saveAdjustBtn" class="btn btn-success" onclick="saveAdjustment()">Save</button>
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function updateStock(productName) {
-            document.getElementById('inventoryProduct').value = productName;
-            // Get current stock from table
-            const row = Array.from(document.querySelectorAll('tbody tr')).find(r => r.cells[0].textContent.includes(productName));
-            if (row) {
-                const stockText = row.cells[3].textContent.trim().split('\n')[0];
-                document.getElementById('currentStock').value = stockText;
-            }
-            document.getElementById('inventoryModal').classList.add('show');
+<script>
+    function exportInventory() {
+        alert('Xuất dữ liệu tồn kho ra Excel thành công!');
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.getElementById('variantTableBody').getElementsByTagName('tr');
+
+        for (let row of rows) {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchText) ? '' : 'none';
         }
-
-        function closeModal() {
-            document.getElementById('inventoryModal').classList.remove('show');
-        }
-
-        function saveInventory(event) {
-            event.preventDefault();
-            const product = document.getElementById('inventoryProduct').value;
-            const change = document.getElementById('quantityChange').value;
-            const reason = document.getElementById('reason').value;
-            alert('Cập nhật tồn kho cho ' + product + ' thành công! (Thay đổi: ' + change + ')');
-            closeModal();
-        }
-
-        function exportInventory() {
-            alert('Xuất dữ liệu tồn kho ra Excel thành công!');
-        }
-
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase();
-            const rows = document.getElementById('inventoryList').getElementsByTagName('tr');
-
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchText) ? '' : 'none';
-            }
-        });
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('inventoryModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
-
-        function logout() {
-            if (confirm('Bạn chắc chắn muốn đăng xuất?')) {
-                alert('Đã đăng xuất thành công!');
-            }
-        }
-    </script>
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../cms/product-inventory.js"></script>
 </body>
 </html>

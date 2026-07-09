@@ -2,10 +2,14 @@ package vn.com.shop.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.shop.dto.product.ProductVariantRequestDTO;
 import vn.com.shop.dto.product.ProductVariantResponseDTO;
+import vn.com.shop.dto.response.ResponsePage;
 import vn.com.shop.service.IProductVariantService;
 
 import java.util.List;
@@ -39,5 +43,14 @@ public class ProductVariantController {
     public ResponseEntity<ProductVariantResponseDTO> deleteVariant(@PathVariable Long id){
         productVariantService.deleteVariant(id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping
+    public ResponseEntity<ResponsePage<ProductVariantResponseDTO>> getAllVariants(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                productVariantService.getAllVariants(pageable)
+        );
     }
 }

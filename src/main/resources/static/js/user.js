@@ -26,7 +26,7 @@
         topbar.innerHTML =
             '<a class="brand" href="/home">Shop</a>' +
             '<nav class="nav">' +
-            '<a href="/user/home">Trang chủ</a>' +
+            '<a href="/home">Trang chủ</a>' +
             '<a href="/user/products">Sản phẩm</a>' +
             '<a href="/user/promotions">Khuyến mãi</a>' +
             '<a href="/user/wishlist">Yêu thích</a>' +

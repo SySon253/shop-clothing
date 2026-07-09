@@ -1,11 +1,7 @@
 const API_PRODUCT = "http://localhost:8080/api/products/all-product";
-
-
 document.addEventListener("DOMContentLoaded", () => {
     loadProducts();
 });
-
-
 function loadProducts() {
 
     fetch(API_PRODUCT, {

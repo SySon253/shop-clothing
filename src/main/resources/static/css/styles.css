@@ -637,3 +637,116 @@ tbody tr:hover {
     color:white;
 
 }
+.inventory-card{
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:20px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+    transition:.25s;
+
+}
+
+.inventory-card:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.inventory-card h6{
+
+    color:#888;
+
+    margin-bottom:12px;
+
+}
+
+.inventory-card h2{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+}
+
+.warning{
+
+    border-left:5px solid orange;
+
+}
+
+.danger{
+
+    border-left:5px solid red;
+
+}
+
+.success{
+
+    border-left:5px solid green;
+
+}
+.table td{
+
+    vertical-align:middle;
+
+    padding:18px;
+
+}
+
+.table th{
+
+    white-space:nowrap;
+
+}
+.badge{
+
+    padding:8px 14px;
+
+    font-size:13px;
+
+    border-radius:20px;
+
+}
+.btn-sm{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:10px;
+
+}
+.inventory-value{
+
+    white-space:nowrap;
+
+    font-weight:bold;
+
+}
+.admin-container{
+    display:flex;
+    min-height:100vh;
+    width:100%;
+}
+/* Đảm bảo bảng nội dung có thể cuộn ngang nếu màn hình nhỏ hoặc dữ liệu quá dài */
+#historyModal .modal-body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ép bảng không được ghi đè hoặc tràn ra khỏi container */
+#historyModal .table {
+    width: 100% !important;
+    margin-bottom: 0;
+}
+
+/* Đảm bảo modal-content ôm trọn vẹn dữ liệu */
+#historyModal .modal-content {
+    box-shadow: 0 5px 15px rgba(0,0,0,.5);
+    border-radius: 8px; /* Bo góc cho hiện đại hơn */
+}

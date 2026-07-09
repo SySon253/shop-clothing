@@ -8,6 +8,7 @@ import vn.com.shop.repository.CartRepository;
 import vn.com.shop.repository.OrderRepository;
 import vn.com.shop.repository.PaymentRepository;
 import vn.com.shop.repository.ProductVariantRepository;
+import vn.com.shop.service.IInventoryService;
 import vn.com.shop.service.IPaymentService;
 import vn.com.shop.service.IVNPayService;
 
@@ -23,7 +24,7 @@ public class PaymentServiceImpl implements IPaymentService {
 
 
     private final OrderRepository orderRepository;
-
+    private final IInventoryService iInventoryService;
 
     private final IVNPayService vnPayService;
     private final CartRepository cartRepository;
@@ -93,38 +94,42 @@ public class PaymentServiceImpl implements IPaymentService {
             // Thanh toán thành công
             payment.setPaymentStatus("SUCCESS");
             payment.setTransactionId(params.get("vnp_TransactionNo"));
+            iInventoryService.deductStock(order);
+
             order.setStatus(OrderStatus.PAID);
+
+            orderRepository.save(order);
             // =========================
             // GIẢM TỒN KHO
             // =========================
 
-            for(OrderItemEntity item : order.getItems()){
-
-
-                ProductVariantEntity variant =
-                        item.getProductVariant();
-
-
-                if(variant.getStock() < item.getQuantity()){
-
-                    throw new RuntimeException(
-                            "Không đủ tồn kho"
-                    );
-
-                }
-
-
-                variant.setStock(
-                        variant.getStock()
-                                - item.getQuantity()
-                );
-
-
-                productVariantRepository.save(
-                        variant
-                );
-
-            }
+//            for(OrderItemEntity item : order.getItems()){
+//
+//
+//                ProductVariantEntity variant =
+//                        item.getProductVariant();
+//
+//
+//                if(variant.getStock() < item.getQuantity()){
+//
+//                    throw new RuntimeException(
+//                            "Không đủ tồn kho"
+//                    );
+//
+//                }
+//
+//
+//                variant.setStock(
+//                        variant.getStock()
+//                                - item.getQuantity()
+//                );
+//
+//
+//                productVariantRepository.save(
+//                        variant
+//                );
+//
+//            }
             CartEntity cart = cartRepository.findByUserId(order.getUser().getId()).orElse(null);
             if(cart != null){
                 Set<Long> cartItemIds =
