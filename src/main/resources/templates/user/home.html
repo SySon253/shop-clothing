@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Trang chủ</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script defer src="/js/user.js"></script>
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+<header class="topbar">
+    <div class="logo"><a th:href="@{/}">Shop</a></div>
+    <nav class="nav">
+        <a href="/user/home">Trang chủ</a>
+        <a href="/user/products">Danh mục</a>
+        <a href="/user/products">Sản phẩm</a>
+        <a href="/user/promotions">Khuyến mãi</a>
+        <a href="/user/cart">Cart</a>
+        <a href="/user/wishlist">Wishlist</a>
+    </nav>
+    <div class="user-menu">
+        <button id="userBtn">Tài khoản ▾</button>
+        <div id="userDropdown" class="dropdown hidden">
+            <a href="/user/account">Tài khoản</a>
+            <a href="/user/orders">Đơn mua</a>
+            <a href="/logout">Đăng xuất</a>
+        </div>
+    </div>
+</header>
+
+<main class="content">
+    <h1>Chào mừng đến với Shop</h1>
+    <p>Danh sách sản phẩm nổi bật sẽ hiển thị ở đây.</p>
+</main>
+</body>
+</html>

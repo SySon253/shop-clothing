@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Yêu thích</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="/js/user.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+
+    <style>
+
+        body{
+            background:#0d0d0d;
+            font-family:Inter,sans-serif;
+        }
+
+        .serif{
+            font-family:"Playfair Display",serif;
+        }
+
+    </style>
+
+
+</head>
+
+
+<body>
+
+
+<div id="app"></div>
+
+
+
+<script>
+
+
+    const products=[
+
+        {
+            id:1,
+            name:"Áo khoác Luxury Black",
+            category:"Áo khoác",
+            price:450000,
+            rating:4.8,
+            image:"https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3"
+        },
+
+        {
+            id:2,
+            name:"Áo sơ mi Premium",
+            category:"Áo",
+            price:250000,
+            rating:4.5,
+            image:"https://images.unsplash.com/photo-1598033129183-c4f50c736f10"
+        },
+
+        {
+            id:3,
+            name:"Quần âu cao cấp",
+            category:"Quần",
+            price:350000,
+            rating:4.7,
+            image:"https://images.unsplash.com/photo-1506629905607-d405b7a0c6f2"
+        },
+
+        {
+            id:4,
+            name:"Váy Luxury White",
+            category:"Váy",
+            price:550000,
+            rating:4.9,
+            image:"https://images.unsplash.com/photo-1595777457583-95e059d581b8"
+        }
+
+    ];
+
+
+
+    let wishlist=[1,4];
+
+
+
+    function fmt(price){
+
+        return price.toLocaleString("vi-VN")+" ₫";
+
+    }
+
+
+
+    function toggleWishlist(id){
+
+        if(wishlist.includes(id)){
+
+            wishlist=wishlist.filter(
+                x=>x!==id
+            );
+
+        }else{
+
+            wishlist.push(id);
+
+        }
+
+
+        render();
+
+    }
+
+
+
+    function addCart(id){
+
+        const product=
+            products.find(p=>p.id===id);
+
+
+        alert(
+            "Đã thêm "+product.name+" vào giỏ hàng"
+        );
+
+    }
+
+
+
+
+    function render(){
+
+
+        const items=
+            products.filter(
+                p=>wishlist.includes(p.id)
+            );
+
+
+
+        document.getElementById("app").innerHTML=`
+
+
+<div class="min-h-screen pt-20">
+
+
+<div class="max-w-7xl mx-auto px-6 py-16">
+
+
+<div class="mb-10">
+
+
+<p style="
+color:#c9a84c;
+font-size:.7rem;
+letter-spacing:.3em;
+text-transform:uppercase">
+
+Yêu thích
+
+</p>
+
+
+
+<h1 class="serif text-white text-4xl">
+
+
+Danh sách yêu thích
+
+<span style="
+color:#8a8a8a;
+font-size:1.2rem">
+
+(${items.length})
+
+</span>
+
+
+</h1>
+
+
+</div>
+
+
+
+
+
+${
+            items.length===0
+
+                ?
+
+                `
+
+<div class="flex flex-col items-center justify-center py-32 gap-5">
+
+
+<i data-lucide="heart"
+
+width="64"
+
+style="color:#252525">
+
+</i>
+
+
+
+<h2 class="serif text-white text-2xl">
+
+Chưa có sản phẩm yêu thích
+
+</h2>
+
+
+
+<p class="text-gray-500">
+
+Nhấn vào biểu tượng trái tim để lưu sản phẩm yêu thích.
+
+</p>
+
+
+
+</div>
+
+`
+
+                :
+
+                `
+
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+
+
+${items.map(p=>`
+
+
+
+<div class="rounded-xl overflow-hidden"
+
+style="
+background:#161616;
+border:1px solid rgba(201,168,76,.1)"
+>
+
+
+
+<div class="relative">
+
+
+<img
+
+src="${p.image}"
+
+class="w-full h-64 object-cover"
+
+>
+
+
+
+<button
+
+onclick="toggleWishlist(${p.id})"
+
+class="absolute top-3 right-3 p-2 rounded-full"
+
+style="
+background:#0d0d0d;
+color:#c9a84c">
+
+<i data-lucide="heart"
+
+fill="#c9a84c"
+
+width="18">
+
+</i>
+
+
+</button>
+
+
+</div>
+
+
+
+
+<div class="p-4">
+
+
+<p class="text-gray-500 text-xs uppercase">
+
+${p.category}
+
+</p>
+
+
+
+<h3 class="serif text-white mt-2">
+
+${p.name}
+
+</h3>
+
+
+
+<p style="
+color:#c9a84c;
+font-weight:600"
+
+class="mt-2">
+
+${fmt(p.price)}
+
+</p>
+
+
+
+<p class="text-gray-500 text-sm">
+
+★ ${p.rating}
+
+</p>
+
+
+
+<button
+
+onclick="addCart(${p.id})"
+
+class="w-full mt-4 py-2 rounded-lg"
+
+style="
+background:#c9a84c;
+color:#0d0d0d">
+
+Thêm vào giỏ
+
+</button>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+`).join("")}
+
+
+</div>
+
+
+`
+
+        }
+
+
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+
+        lucide.createIcons();
+
+
+    }
+
+
+
+    render();
+
+
+</script>
+
+
+</body>
+
+</html>

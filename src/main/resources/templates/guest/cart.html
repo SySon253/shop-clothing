@@ -26,14 +26,34 @@
 </head>
 
 <body>
-    <!-- Topbar Start -->
-    <div th:include="guest/common/sidebar.html :: topbar-fragment"></div>
-    <!-- Topbar End -->
+<header class="topbar">
+    <div class="logo">
+        <a th:href="@{/}">Shop</a>
+    </div>
 
+    <nav class="nav">
+        <a href="/home">Trang chủ</a>
+        <a href="/user/products">Sản phẩm</a>
+        <a href="/user/promotions">Khuyến mãi</a>
+        <a href="/user/wishlist">Yêu thích</a>
+        <a href="/cart">Giỏ hàng</a>
+        <a href="/checkout">Thanh toán</a>
+    </nav>
 
-    <!-- Navbar Start -->
-    <div th:include="guest/common/navbar.html :: navbar-fragment"></div>
-    <!-- Navbar End -->
+    <div class="user-menu">
+
+        <button type="button" id="userBtn">
+            Tài khoản ▾
+        </button>
+
+        <div id="userDropdown" class="dropdown">
+            <a href="/user/account">Tài khoản</a>
+            <a href="/user/orders">Đơn mua</a>
+            <a href="/logout">Đăng xuất</a>
+        </div>
+
+    </div>
+</header>
 
 
     <!-- Page Header Start -->
@@ -65,111 +85,7 @@
                         </tr>
                     </thead>
                     <tbody class="align-middle">
-                        <tr>
-                            <td class="align-middle"><img src="img/product-1.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle"><img src="img/product-2.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle"><img src="img/product-3.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle"><img src="img/product-4.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                        </tr>
-                        <tr>
-                            <td class="align-middle"><img src="img/product-5.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle">$150</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -187,21 +103,72 @@
                         <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
                     </div>
                     <div class="card-body">
+
+
                         <div class="d-flex justify-content-between mb-3 pt-1">
-                            <h6 class="font-weight-medium">Subtotal</h6>
-                            <h6 class="font-weight-medium">$150</h6>
+
+
+                            <h6>
+                                Selected Items
+                            </h6>
+
+
+                            <h6 id="selected-count">
+                                0
+                            </h6>
+
+
                         </div>
+
+
+
+                        <div class="d-flex justify-content-between mb-3 pt-1">
+
+
+                            <h6>
+                                Subtotal
+                            </h6>
+
+
+                            <h6 id="selected-subtotal">
+                                0 ₫
+                            </h6>
+
+
+                        </div>
+
+
+
                         <div class="d-flex justify-content-between">
-                            <h6 class="font-weight-medium">Shipping</h6>
-                            <h6 class="font-weight-medium">$10</h6>
+
+
+                            <h6>
+                                Shipping
+                            </h6>
+
+
+                            <h6 id="selected-shipping">
+                                0 ₫
+                            </h6>
+
+
                         </div>
+
+
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
                         <div class="d-flex justify-content-between mt-2">
                             <h5 class="font-weight-bold">Total</h5>
                             <h5 class="font-weight-bold">$160</h5>
                         </div>
-                        <button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+<!--                        <a onclick="goCheckout()" href="/checkout" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</a>-->
+                        <button
+                                onclick="goCheckout()"
+                                class="btn btn-block btn-primary my-3 py-3">
+
+                            Proceed To Checkout
+
+                        </button>
                     </div>
                 </div>
             </div>
@@ -230,7 +197,33 @@
     <script src="mail/contact.js"></script>
 
     <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+    <script src="js/cart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+
+        const btn = document.getElementById("userBtn");
+        const menu = document.getElementById("userDropdown");
+
+
+        btn.addEventListener("click", function(e){
+
+            e.stopPropagation();
+
+            menu.classList.toggle("show");
+
+        });
+
+
+        document.addEventListener("click", function(){
+
+            menu.classList.remove("show");
+
+        });
+
+
+    });
+</script>
 </body>
 
 </html>
