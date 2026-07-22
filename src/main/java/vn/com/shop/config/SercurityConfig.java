@@ -31,6 +31,12 @@ public class SercurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
@@ -42,6 +48,7 @@ public class SercurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/products/all-product").permitAll()
                         .requestMatchers("/api/carts/**").authenticated()
                         .requestMatchers("/api/payment/**","/api/orders/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout.disable())

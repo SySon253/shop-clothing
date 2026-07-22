@@ -16,5 +16,5 @@ public class VNPayConfig {
 
 
     public static final String RETURN_URL =
-            "https://trivial-cabdriver-subsidize.ngrok-free.dev/api/payment/vnpay-return";
+            "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 }
