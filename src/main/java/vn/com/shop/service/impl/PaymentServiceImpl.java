@@ -20,154 +20,63 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class PaymentServiceImpl implements IPaymentService {
+
     private final PaymentRepository paymentRepository;
-
-
     private final OrderRepository orderRepository;
-    private final IInventoryService iInventoryService;
-
-    private final IVNPayService vnPayService;
     private final CartRepository cartRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final IInventoryService iInventoryService;
+    private final IVNPayService vnPayService;
+
     @Override
-    public String handleVNPayCallback(
-            Map<String,String> params
-    ){
-        // =========================
+    public String handleVNPayCallback(Map<String, String> params) {
         // 1. Verify chữ ký VNPay
-        // =========================
-
-
-        boolean valid =
-                vnPayService
-                        .verifyPayment(params);
-
-
-
-        if(!valid){
-
-
+        boolean valid = vnPayService.verifyPayment(params);
+        if (!valid) {
             return "INVALID_SIGNATURE";
-
-
         }
 
-        // =========================
-        // 2. Lấy orderId
-        // =========================
+        // 2. Lấy orderId từ txnRef
+        String orderId = params.get("vnp_TxnRef");
+        PaymentEntity payment = paymentRepository.findByOrderId(Long.valueOf(orderId))
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy payment"));
 
+        // 3. Kiểm tra trạng thái đơn hàng và kết quả VNPay
+        OrderEntity order = payment.getOrder();
+        if (OrderStatus.PAID.equals(order.getStatus())) {
+            return "ALREADY_PAID";
+        }
 
-        String orderId =
-                params.get(
-                        "vnp_TxnRef"
-                );
-
-
-
-        PaymentEntity payment =
-
-                paymentRepository
-                        .findByOrderId(
-                                Long.valueOf(orderId)
-                        )
-
-                        .orElseThrow(
-                                () ->
-                                        new RuntimeException(
-                                                "Không tìm thấy payment"
-                                        )
-                        );
-
-
-        // =========================
-        // 3. Kiểm tra kết quả VNPay
-        // =========================
         String responseCode = params.get("vnp_ResponseCode");
 
-        OrderEntity order = payment.getOrder();
-        if(OrderStatus.PAID.equals(order.getStatus())){
-
-            return "ALREADY_PAID";
-
-        }
-        if("00".equals(responseCode)){
+        if ("00".equals(responseCode)) {
             // Thanh toán thành công
             payment.setPaymentStatus("SUCCESS");
             payment.setTransactionId(params.get("vnp_TransactionNo"));
+
             iInventoryService.deductStock(order);
-
             order.setStatus(OrderStatus.PAID);
-
             orderRepository.save(order);
-            // =========================
-            // GIẢM TỒN KHO
-            // =========================
 
-//            for(OrderItemEntity item : order.getItems()){
-//
-//
-//                ProductVariantEntity variant =
-//                        item.getProductVariant();
-//
-//
-//                if(variant.getStock() < item.getQuantity()){
-//
-//                    throw new RuntimeException(
-//                            "Không đủ tồn kho"
-//                    );
-//
-//                }
-//
-//
-//                variant.setStock(
-//                        variant.getStock()
-//                                - item.getQuantity()
-//                );
-//
-//
-//                productVariantRepository.save(
-//                        variant
-//                );
-//
-//            }
+            // Xóa sản phẩm đã mua khỏi giỏ hàng
             CartEntity cart = cartRepository.findByUserId(order.getUser().getId()).orElse(null);
-            if(cart != null){
-                Set<Long> cartItemIds =
-                        order.getItems()
-                                .stream()
-                                .map(
-                                        OrderItemEntity::getCartItemId
-                                )
-                                .collect(Collectors.toSet());
+            if (cart != null) {
+                Set<Long> cartItemIds = order.getItems().stream()
+                        .map(OrderItemEntity::getCartItemId)
+                        .collect(Collectors.toSet());
 
-
-
-                cart.getItems()
-                        .removeIf(
-                                item ->
-                                        cartItemIds.contains(
-                                                item.getId()
-                                        )
-                        );
-
-
-
+                cart.getItems().removeIf(item -> cartItemIds.contains(item.getId()));
                 cartRepository.save(cart);
-
             }
+        } else {
+            // Thanh toán thất bại
+            payment.setPaymentStatus("FAILED");
+            order.setStatus(OrderStatus.CANCELLED);
         }
-        else{
-            // thất bại
-            payment.setPaymentStatus(
-                    "FAILED"
-            );
-            order.setStatus(
-                    OrderStatus.CANCELLED
-            );
-        }
+
         paymentRepository.save(payment);
         orderRepository.save(order);
+
         return responseCode;
     }
-
 }

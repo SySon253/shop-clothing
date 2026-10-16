@@ -9,13 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LogoutController {
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {
-
         Cookie cookie = new Cookie("ACCESS_TOKEN", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-
         response.addCookie(cookie);
-
         return "redirect:/home";
     }
 }

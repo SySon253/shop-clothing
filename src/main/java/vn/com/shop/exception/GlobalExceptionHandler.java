@@ -15,65 +15,30 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidation(
-            MethodArgumentNotValidException ex) {
-
+    public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> response = new HashMap<>();
-
-        FieldError fieldError = ex
-                .getBindingResult()
-                .getFieldError();
+        FieldError fieldError = ex.getBindingResult().getFieldError();
 
         if (fieldError != null) {
-
-            response.put(
-                    "message",
-                    fieldError.getDefaultMessage()
-            );
-
+            response.put("message", fieldError.getDefaultMessage());
         } else {
-
-            response.put(
-                    "message",
-                    "Dữ liệu không hợp lệ."
-            );
-
+            response.put("message", "Dữ liệu không hợp lệ.");
         }
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, String>> handleConstraint(
-            ConstraintViolationException ex) {
-
+    public ResponseEntity<Map<String, String>> handleConstraint(ConstraintViolationException ex) {
         Map<String, String> response = new HashMap<>();
-
-        response.put(
-                "message",
-                ex.getMessage()
-        );
-
-        return ResponseEntity
-                .badRequest()
-                .body(response);
+        response.put("message", ex.getMessage());
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntime(
-            RuntimeException ex) {
-
+    public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException ex) {
         Map<String, String> response = new HashMap<>();
-
-        response.put(
-                "message",
-                ex.getMessage()
-        );
-
-        return ResponseEntity
-                .badRequest()
-                .body(response);
+        response.put("message", ex.getMessage());
+        return ResponseEntity.badRequest().body(response);
     }
 }

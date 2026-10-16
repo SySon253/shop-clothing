@@ -15,62 +15,37 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class InventoryMovementServiceImpl implements IInventoryMovementService {
+
     private final InventoryMovementRepository repository;
     private final InventoryMovementMapper mapper;
+
     @Override
     public void createMovement(
-
             ProductVariantEntity variant,
-
             InventoryMovementType type,
-
             Integer before,
-
             Integer change,
-
             Integer after,
-
             String reason,
+            String reference) {
 
-            String reference){
-
-        InventoryMovementEntity movement =
-                new InventoryMovementEntity();
-
+        InventoryMovementEntity movement = new InventoryMovementEntity();
         movement.setVariant(variant);
-
         movement.setMovementType(type);
-
         movement.setQuantityBefore(before);
-
         movement.setQuantityChange(change);
-
         movement.setQuantityAfter(after);
-
         movement.setReason(reason);
-
         movement.setReferenceCode(reference);
 
         repository.save(movement);
-
     }
+
     @Override
-    public List<InventoryMovementResponseDTO>
-    getHistory(Long variantId){
-
-        return repository
-
-                .findByVariantIdOrderByCreatedDateDesc(
-                        variantId
-                )
-
+    public List<InventoryMovementResponseDTO> getHistory(Long variantId) {
+        return repository.findByVariantIdOrderByCreatedDateDesc(variantId)
                 .stream()
-
-                .map(
-                        mapper::entityToDto
-                )
-
+                .map(mapper::entityToDto)
                 .toList();
-
     }
 }

@@ -7,10 +7,7 @@ import vn.com.shop.entity.OrderEntity;
 public interface IInventoryService {
 
     void deductStock(OrderEntity order);
-
     void restoreStock(OrderEntity order);
-    void adjustInventory(
-            InventoryAdjustmentRequestDTO request
-    );
+    void adjustInventory(InventoryAdjustmentRequestDTO request);
     InventoryDashboardDTO getDashboard();
 }

@@ -10,98 +10,27 @@ import java.util.List;
 
 public class OrderSpecification {
 
-
-    public static Specification<OrderEntity> filter(
-            OrderRequestFilter filter
-    ){
-
+    public static Specification<OrderEntity> filter(OrderRequestFilter filter) {
         return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
+            // Search keyword (receiverName, phone, orderCode)
+            if (filter.getKeyword() != null && !filter.getKeyword().isEmpty()) {
+                String keyword = "%" + filter.getKeyword().toLowerCase() + "%";
 
-            List<Predicate> predicates =
-                    new ArrayList<>();
+                Predicate receiver = cb.like(cb.lower(root.get("receiverName")), keyword);
+                Predicate phone = cb.like(root.get("phone"), keyword);
+                Predicate orderCode = cb.like(cb.lower(root.get("orderCode")), keyword);
 
-
-            // ==========================
-            // SEARCH KEYWORD
-            // ==========================
-
-            if(filter.getKeyword()!=null
-                    &&
-                    !filter.getKeyword().isEmpty()){
-
-
-                String keyword =
-                        "%"
-                                + filter.getKeyword()
-                                .toLowerCase()
-                                + "%";
-
-
-                Predicate receiver =
-                        cb.like(
-                                cb.lower(
-                                        root.get("receiverName")
-                                ),
-                                keyword
-                        );
-
-
-                Predicate phone =
-                        cb.like(
-                                root.get("phone"),
-                                keyword
-                        );
-
-
-                Predicate orderCode =
-                        cb.like(
-                                cb.lower(
-                                        root.get("orderCode")
-                                ),
-                                keyword
-                        );
-
-
-                predicates.add(
-                        cb.or(
-                                receiver,
-                                phone,
-                                orderCode
-                        )
-                );
-
+                predicates.add(cb.or(receiver, phone, orderCode));
             }
 
-
-
-            // ==========================
-            // STATUS
-            // ==========================
-
-            if(filter.getStatus()!=null){
-
-
-                predicates.add(
-                        cb.equal(
-                                root.get("status"),
-                                filter.getStatus()
-                        )
-                );
-
-
+            // Status filter
+            if (filter.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
             }
 
-
-
-            return cb.and(
-                    predicates.toArray(
-                            new Predicate[0]
-                    )
-            );
-
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
-
     }
-
 }

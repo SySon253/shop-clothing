@@ -16,33 +16,13 @@ public class InventoryController {
     private final IInventoryService inventoryService;
 
     @PostMapping("/adjust")
-    public ResponseEntity<Void> adjustInventory(
-
-            @Valid
-
-            @RequestBody
-
-            InventoryAdjustmentRequestDTO request
-
-    ){
-
-        inventoryService.adjustInventory(
-                request
-        );
-
+    public ResponseEntity<Void> adjustInventory(@Valid @RequestBody InventoryAdjustmentRequestDTO request) {
+        inventoryService.adjustInventory(request);
         return ResponseEntity.ok().build();
-
     }
+
     @GetMapping("/dashboard")
-    public ResponseEntity<InventoryDashboardDTO>
-    dashboard(){
-
-        return ResponseEntity.ok(
-
-                inventoryService.getDashboard()
-
-        );
-
+    public ResponseEntity<InventoryDashboardDTO> getDashboard() {
+        return ResponseEntity.ok(inventoryService.getDashboard());
     }
-
 }

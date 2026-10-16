@@ -18,47 +18,30 @@ import java.util.List;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrdersResourceController {
+
     private final IOrderService orderService;
-    @PostMapping("/orders")
-    public ResponseEntity<OrderCreateResponseDTO> createOrder(
-            @RequestBody OrderRequestDTO request
-    ){
+
+    @PostMapping
+    public ResponseEntity<OrderCreateResponseDTO> createOrder(@RequestBody OrderRequestDTO request) {
         System.out.println("===== CREATE ORDER CONTROLLER =====");
         return ResponseEntity.ok(orderService.createOrder(request));
     }
-    @GetMapping("/admin/orders")
+
+    @GetMapping("/admin")
     public ResponseEntity<ResponsePage<OrderResponseDTO>> getAllOrders(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) OrderStatus status,
+            Pageable pageable) {
 
-            @RequestParam(required = false)
-            OrderStatus status,
-
-            Pageable pageable
-    ){
-
-        OrderRequestFilter filter =
-                new OrderRequestFilter();
-
-
+        OrderRequestFilter filter = new OrderRequestFilter();
         filter.setKeyword(keyword);
-
         filter.setStatus(status);
 
-
-        return ResponseEntity.ok(
-                orderService.getAllOrders(
-                        filter,
-                        pageable
-                )
-        );
-
+        return ResponseEntity.ok(orderService.getAllOrders(filter, pageable));
     }
+
     @GetMapping("/my-orders")
-    public ResponseEntity<List<OrderResponseDTO>> getMyOrders(){
-
-        return ResponseEntity.ok(
-                orderService.getMyOrders()
-        );
-
+    public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
+        return ResponseEntity.ok(orderService.getMyOrders());
     }
 }

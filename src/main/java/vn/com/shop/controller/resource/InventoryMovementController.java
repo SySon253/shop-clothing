@@ -19,21 +19,7 @@ public class InventoryMovementController {
     private final IInventoryMovementService service;
 
     @GetMapping("/{variantId}")
-    public ResponseEntity<
-                List<InventoryMovementResponseDTO>
-                > getHistory(
-
-            @PathVariable
-            Long variantId){
-
-        return ResponseEntity.ok(
-
-                service.getHistory(
-                        variantId
-                )
-
-        );
-
+    public ResponseEntity<List<InventoryMovementResponseDTO>> getHistory(@PathVariable Long variantId) {
+        return ResponseEntity.ok(service.getHistory(variantId));
     }
-
 }

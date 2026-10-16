@@ -19,11 +19,8 @@ public class HomeController {
             @PathVariable Long id,
             Model model
     ) {
-
         model.addAttribute("productId", id);
-
         return "guest/detail";
-
     }
 
     @GetMapping(value = "/cart")

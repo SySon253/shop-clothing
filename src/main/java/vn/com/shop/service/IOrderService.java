@@ -11,16 +11,9 @@ import vn.com.shop.dto.response.ResponsePage;
 import java.util.List;
 
 public interface IOrderService {
-    OrderCreateResponseDTO createOrder(
-            OrderRequestDTO request
-    );
-
+    OrderCreateResponseDTO createOrder(OrderRequestDTO request);
     ResponsePage<OrderResponseDTO> getAllOrders(OrderRequestFilter orderFilterRequest, Pageable pageable);
-
-    void completePayment(
-            Long orderId
-    );
-
+    void completePayment(Long orderId);
     @Transactional(readOnly = true)
     List<OrderResponseDTO> getMyOrders();
 

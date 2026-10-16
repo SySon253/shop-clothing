@@ -125,38 +125,15 @@ public class ProductServiceImpl implements IProductService {
 @Override
 @Transactional
 public void deleteProduct(Long id) {
-
-    ProductEntity product =
-            productRepository.findById(id)
-                    .orElseThrow(() ->
-                            new RuntimeException("product not found")
-                    );
-
-
+    ProductEntity product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("product not found"));
     product.setDeleted(true);
-
-
-    product.getVariants()
-            .forEach(variant ->
-                    variant.setDeleted(true)
-            );
-
-
-    product.getImages()
-            .forEach(image ->
-                    image.setDeleted(true)
-            );
-
-
+    product.getVariants().forEach(variant ->variant.setDeleted(true));
+    product.getImages().forEach(image ->image.setDeleted(true) );
 }
 
     @Override
     public ProductResponseDTO getProductById(Long id) {
-        ProductEntity product = productRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy sản phẩm")
-                );
+        ProductEntity product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
         System.out.println("Images = " + product.getImages().size());
         return productMapper.entityToDto(product);

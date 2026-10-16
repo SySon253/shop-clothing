@@ -18,10 +18,13 @@ import java.util.List;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryResourceController {
+
     private final ICategoryService categoryService;
 
     @PostMapping("/all-category")
-    public ResponseEntity<ResponsePage<CategoryResponseDTO>> getAllCategory(@RequestBody(required = false) CategoryRequestFilter requestFilter, Pageable pageable) {
+    public ResponseEntity<ResponsePage<CategoryResponseDTO>> getAllCategory(
+            @RequestBody(required = false) CategoryRequestFilter requestFilter,
+            Pageable pageable) {
         if (requestFilter == null) {
             requestFilter = new CategoryRequestFilter();
         }
@@ -29,24 +32,26 @@ public class CategoryResourceController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<CategoryResponseDTO>> getAllCategory(@RequestParam String name) {
+    public ResponseEntity<List<CategoryResponseDTO>> searchCategories(@RequestParam String name) {
         return ResponseEntity.ok(categoryService.getCategoryByName(name));
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponseDTO> createdCategory(@RequestBody CategoryCreateDTO categoryCreateDTO){
+    public ResponseEntity<CategoryResponseDTO> createCategory(@RequestBody CategoryCreateDTO categoryCreateDTO) {
         CategoryResponseDTO categoryResponseDTO = categoryService.createCategory(categoryCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryResponseDTO);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateDTO categoryUpdateDTO){
+    public ResponseEntity<CategoryResponseDTO> updateCategory(
+            @PathVariable Long id,
+            @RequestBody CategoryUpdateDTO categoryUpdateDTO) {
         CategoryResponseDTO categoryResponseDTO = categoryService.updateCategory(id, categoryUpdateDTO);
         return ResponseEntity.ok(categoryResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> deleteCategory(@PathVariable Long id){
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }

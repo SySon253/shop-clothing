@@ -7,13 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/checkout")
 public class CheckoutController {
-
-
     @GetMapping
     public String checkout(){
-
         return "guest/checkout";
-
     }
-
 }

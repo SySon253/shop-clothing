@@ -12,49 +12,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/test")
 public class TestSecurityController {
+
     @GetMapping("/me")
-    public Map<String,Object> getCurrentUser(){
+    public Map<String, Object> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-
-
-        Map<String,Object> result =
-                new HashMap<>();
-
-
-        result.put(
-                "principal",
-                authentication.getPrincipal()
-        );
-
-
-        result.put(
-                "principalClass",
-                authentication
-                        .getPrincipal()
-                        .getClass()
-                        .getName()
-        );
-
-
-        result.put(
-                "name",
-                authentication.getName()
-        );
-
-
-        result.put(
-                "authorities",
-                authentication.getAuthorities()
-        );
-
+        Map<String, Object> result = new HashMap<>();
+        result.put("principal", authentication.getPrincipal());
+        result.put("principalClass", authentication.getPrincipal().getClass().getName());
+        result.put("name", authentication.getName());
+        result.put("authorities", authentication.getAuthorities());
 
         return result;
-
     }
 }

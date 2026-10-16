@@ -20,286 +20,142 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class InventoryServiceImpl implements IInventoryService {
+
     private final ProductVariantRepository variantRepository;
     private final IInventoryMovementService movementService;
+
     @Override
     public void deductStock(OrderEntity order) {
-
         for (OrderItemEntity item : order.getItems()) {
-
-            ProductVariantEntity variant =
-                    variantRepository
-                            .findByIdForUpdate(
-                                    item.getProductVariant().getId()
-                            )
-                            .orElseThrow(
-                                    () -> new RuntimeException(
-                                            "Variant Not Found"
-                                    )
-                            );
+            ProductVariantEntity variant = variantRepository.findByIdForUpdate(item.getProductVariant().getId())
+                    .orElseThrow(() -> new RuntimeException("Variant Not Found"));
 
             if (variant.getStock() < item.getQuantity()) {
-
-                throw new RuntimeException(
-                        "Stock Not Enough"
-                );
-
+                throw new RuntimeException("Stock Not Enough");
             }
-            int before = variant.getStock();
 
+            int before = variant.getStock();
             int after = before - item.getQuantity();
 
             variant.setStock(after);
-
-            variant.setSold(
-                    variant.getSold()
-                            + item.getQuantity()
-            );
+            variant.setSold(variant.getSold() + item.getQuantity());
 
             movementService.createMovement(
-
                     variant,
-
                     InventoryMovementType.SALE,
-
                     before,
-
                     -item.getQuantity(),
-
                     after,
-
                     "Customer purchased",
-
                     order.getOrderCode()
-
             );
-
         }
-
     }
 
     @Override
     public void restoreStock(OrderEntity order) {
-
         for (OrderItemEntity item : order.getItems()) {
-            ProductVariantEntity variant =
-                    variantRepository
-                            .findByIdForUpdate(
-                                    item.getProductVariant().getId()
-                            )
-                            .orElseThrow(
-                                    () -> new RuntimeException(
-                                            "Variant Not Found"
-                                    )
-                            );
-            int before = variant.getStock();
+            ProductVariantEntity variant = variantRepository.findByIdForUpdate(item.getProductVariant().getId())
+                    .orElseThrow(() -> new RuntimeException("Variant Not Found"));
 
+            int before = variant.getStock();
             int after = before + item.getQuantity();
 
             variant.setStock(after);
-
-            variant.setSold(
-                    variant.getSold()
-                            - item.getQuantity()
-            );
+            variant.setSold(variant.getSold() - item.getQuantity());
 
             movementService.createMovement(
-
                     variant,
-
                     InventoryMovementType.CANCEL_ORDER,
-
                     before,
-
                     item.getQuantity(),
-
                     after,
-
                     "Cancel order",
-
                     order.getOrderCode()
-
             );
-
         }
-
     }
+
     @Override
     @Transactional
-    public void adjustInventory(
-            InventoryAdjustmentRequestDTO request
-    ) {
-
-        ProductVariantEntity variant =
-
-                variantRepository
-                        .findByIdForUpdate(
-                                request.getVariantId()
-                        )
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Variant not found"
-                                )
-                        );
+    public void adjustInventory(InventoryAdjustmentRequestDTO request) {
+        ProductVariantEntity variant = variantRepository.findByIdForUpdate(request.getVariantId())
+                .orElseThrow(() -> new RuntimeException("Variant not found"));
 
         int before = variant.getStock();
-
         int after = before;
 
         switch (request.getMovementType()) {
-
             case IMPORT, RETURN -> {
-
                 after += request.getQuantity();
-
             }
-
-            case DAMAGED,
-                 LOST -> {
-
+            case DAMAGED, LOST -> {
                 if (before < request.getQuantity()) {
-
-                    throw new RuntimeException(
-                            "Stock not enough"
-                    );
-
+                    throw new RuntimeException("Stock not enough");
                 }
-
                 after -= request.getQuantity();
-
             }
-
             case ADJUSTMENT -> {
-
                 after += request.getQuantity();
-
                 if (after < 0) {
-
-                    throw new RuntimeException(
-                            "Stock cannot be negative"
-                    );
-
+                    throw new RuntimeException("Stock cannot be negative");
                 }
-
             }
-
-            default ->
-
-                    throw new RuntimeException(
-                            "Movement type is not allowed"
-                    );
-
+            default -> throw new RuntimeException("Movement type is not allowed");
         }
 
         variant.setStock(after);
-
         variantRepository.save(variant);
 
         movementService.createMovement(
-
                 variant,
-
                 request.getMovementType(),
-
                 before,
-
                 after - before,
-
                 after,
-
                 request.getReason(),
-
                 request.getReferenceCode()
-
         );
-
     }
+
     @Override
     @Transactional(readOnly = true)
     public InventoryDashboardDTO getDashboard() {
+        List<ProductVariantEntity> variants = variantRepository.findByDeletedFalse();
+        InventoryDashboardDTO dto = new InventoryDashboardDTO();
 
-        List<ProductVariantEntity> variants =
-                variantRepository.findByDeletedFalse();
-
-        InventoryDashboardDTO dto =
-                new InventoryDashboardDTO();
-
-        dto.setTotalVariants(
-                (long) variants.size()
-        );
+        dto.setTotalVariants((long) variants.size());
 
         dto.setLowStock(
-
                 variants.stream()
-
                         .filter(v -> {
-
-                            int reserved =
-
-                                    v.getReservedStock() == null
-
-                                            ? 0
-
-                                            : v.getReservedStock();
-
-                            int available =
-                                    v.getStock() - reserved;
-
-                            return available > 0
-
-                                    && available <= 20;
-
+                            int reserved = v.getReservedStock() == null ? 0 : v.getReservedStock();
+                            int available = v.getStock() - reserved;
+                            return available > 0 && available <= 20;
                         })
-
                         .count()
-
         );
 
         dto.setOutOfStock(
-
                 variants.stream()
-
                         .filter(v -> {
-
-                            int reserved =
-
-                                    v.getReservedStock() == null
-
-                                            ? 0
-
-                                            : v.getReservedStock();
-
+                            int reserved = v.getReservedStock() == null ? 0 : v.getReservedStock();
                             return v.getStock() - reserved <= 0;
-
                         })
-
                         .count()
-
         );
 
         BigDecimal value = BigDecimal.ZERO;
-
         for (ProductVariantEntity variant : variants) {
+            BigDecimal price = variant.getDiscountPrice() != null ? variant.getDiscountPrice() : variant.getPrice();
+            int reserved = variant.getReservedStock() == null ? 0 : variant.getReservedStock();
+            int available = variant.getStock() - reserved;
 
-            BigDecimal price =
-                    variant.getDiscountPrice() != null
-                            ? variant.getDiscountPrice()
-                            : variant.getPrice();
-
-            int available =
-                    variant.getStock()
-                            - (variant.getReservedStock() == null ? 0 : variant.getReservedStock());
-
-            value = value.add(
-                    price.multiply(
-                            BigDecimal.valueOf(available)
-                    )
-            );
+            value = value.add(price.multiply(BigDecimal.valueOf(available)));
         }
 
         dto.setInventoryValue(value);
 
         return dto;
-
     }
 }

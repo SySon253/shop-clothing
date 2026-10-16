@@ -20,55 +20,28 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductVariantService implements IProductVariantService {
+
     private final ProductRepository productRepository;
-
     private final ProductVariantRepository productVariantRepository;
-
     private final ProductVariantMapper productVariantMapper;
 
     @Override
-    public ProductVariantResponseDTO createVariant(
-            ProductVariantRequestDTO requestDTO) {
+    public ProductVariantResponseDTO createVariant(ProductVariantRequestDTO requestDTO) {
+        ProductEntity product = productRepository.findById(requestDTO.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        ProductEntity product =
-                productRepository.findById(
-                                requestDTO.getProductId())
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Product not found"));
-        if(productVariantRepository
-                .findBySkuAndDeletedFalse(requestDTO.getSku())
-                .isPresent()){
-
+        if (productVariantRepository.findBySkuAndDeletedFalse(requestDTO.getSku()).isPresent()) {
             throw new RuntimeException("SKU đã tồn tại");
-
         }
+
         ProductVariantEntity variant = new ProductVariantEntity();
-
         variant.setProduct(product);
-
         variant.setSku(requestDTO.getSku());
         variant.setPrice(requestDTO.getPrice());
         variant.setDiscountPrice(requestDTO.getDiscountPrice());
         variant.setStock(requestDTO.getStock());
-        variant.setReorderLevel(
-
-                requestDTO.getReorderLevel() == null
-
-                        ?
-
-                        20
-
-                        :
-
-                        requestDTO.getReorderLevel()
-
-        );
-        variant.setReservedStock(
-                requestDTO.getReservedStock() == null
-                        ? 0
-                        : requestDTO.getReservedStock()
-        );
+        variant.setReorderLevel(requestDTO.getReorderLevel() == null ? 20 : requestDTO.getReorderLevel());
+        variant.setReservedStock(requestDTO.getReservedStock() == null ? 0 : requestDTO.getReservedStock());
         variant.setSize(requestDTO.getSize());
         variant.setColor(requestDTO.getColor());
 
@@ -78,123 +51,71 @@ public class ProductVariantService implements IProductVariantService {
     }
 
     @Override
-    public ProductVariantResponseDTO getVariantById(
-            Long id) {
+    public ProductVariantResponseDTO getVariantById(Long id) {
+        ProductVariantEntity variant = productVariantRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new RuntimeException("Variant not found"));
 
-        ProductVariantEntity variant =
-                productVariantRepository.findByIdAndDeletedFalse(id)
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Variant not found"));
-
-        return productVariantMapper.entityToDto(
-                variant);
+        return productVariantMapper.entityToDto(variant);
     }
 
     @Override
-    public List<ProductVariantResponseDTO>
-    getVariantsByProduct(Long productId) {
-
-        return productVariantRepository
-                .findByProductIdAndDeletedFalse(productId)
+    public List<ProductVariantResponseDTO> getVariantsByProduct(Long productId) {
+        return productVariantRepository.findByProductIdAndDeletedFalse(productId)
                 .stream()
                 .map(productVariantMapper::entityToDto)
                 .toList();
     }
 
     @Override
-    public ProductVariantResponseDTO updateVariant(
-            Long id,
-            ProductVariantRequestDTO requestDTO) {
-
-        ProductVariantEntity variant =
-                productVariantRepository.findByIdAndDeletedFalse(id)
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Variant not found"));
+    public ProductVariantResponseDTO updateVariant(Long id, ProductVariantRequestDTO requestDTO) {
+        ProductVariantEntity variant = productVariantRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new RuntimeException("Variant not found"));
 
         variant.setPrice(requestDTO.getPrice());
-        variant.setDiscountPrice(
-                requestDTO.getDiscountPrice());
+        variant.setDiscountPrice(requestDTO.getDiscountPrice());
         variant.setStock(requestDTO.getStock());
-        variant.setReservedStock(
-                requestDTO.getReservedStock());
+        variant.setReservedStock(requestDTO.getReservedStock());
         variant.setSize(requestDTO.getSize());
         variant.setColor(requestDTO.getColor());
-        variant.setReorderLevel(
-
-                requestDTO.getReorderLevel()
-
-        );
+        variant.setReorderLevel(requestDTO.getReorderLevel());
 
         productVariantRepository.save(variant);
 
-        return productVariantMapper.entityToDto(
-                variant);
+        return productVariantMapper.entityToDto(variant);
     }
 
     @Override
     public void deleteVariant(Long id) {
-
-        ProductVariantEntity variant =
-                productVariantRepository.findById(id)
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Variant not found"));
+        ProductVariantEntity variant = productVariantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Variant not found"));
 
         variant.setDeleted(true);
-
         productVariantRepository.save(variant);
     }
+
     @Transactional
-    public void decreaseStock(
-            Long variantId,
-            Integer quantity
-    ){
+    public void decreaseStock(Long variantId, Integer quantity) {
+        ProductVariantEntity variant = productVariantRepository.findByIdAndDeletedFalse(variantId)
+                .orElseThrow(() -> new RuntimeException("Variant không tồn tại"));
 
-        ProductVariantEntity variant =
-                productVariantRepository
-                        .findByIdAndDeletedFalse(variantId)
-                        .orElseThrow(
-                                () -> new RuntimeException(
-                                        "Variant không tồn tại")
-                        );
-
-
-        if(variant.getStock() < quantity){
-
-            throw new RuntimeException(
-                    "Không đủ tồn kho"
-            );
-
+        if (variant.getStock() < quantity) {
+            throw new RuntimeException("Không đủ tồn kho");
         }
 
-
-        variant.setStock(
-                variant.getStock() - quantity
-        );
-        variant.setSold(
-
-                variant.getSold()
-
-                        + quantity
-
-        );
+        variant.setStock(variant.getStock() - quantity);
+        variant.setSold(variant.getSold() + quantity);
 
         productVariantRepository.save(variant);
-
     }
+
     @Override
     public ResponsePage<ProductVariantResponseDTO> getAllVariants(Pageable pageable) {
+        Page<ProductVariantEntity> page = productVariantRepository.findByDeletedFalse(pageable);
 
-        Page<ProductVariantEntity> page =
-                productVariantRepository.findByDeletedFalse(pageable);
-
-        List<ProductVariantResponseDTO> data =
-                page.getContent()
-                        .stream()
-                        .map(productVariantMapper::entityToDto)
-                        .toList();
+        List<ProductVariantResponseDTO> data = page.getContent()
+                .stream()
+                .map(productVariantMapper::entityToDto)
+                .toList();
 
         return ResponsePage.<ProductVariantResponseDTO>builder()
                 .pageNumber(page.getNumber())
